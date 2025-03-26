@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Management System{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if 'loggedin' in session %}
+    <div class="d-flex wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-school me-2"></i>Jarvin CMS
+                </h3>
+                <button id="sidebarCollapseBtn" class="d-md-none ms-auto">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="sidebar-profile text-center mb-4">
+                <div class="user-avatar mb-3">
+                    <i class="fas fa-user-circle fa-4x"></i>
+                </div>
+                <div class="user-info">
+                    <h6 class="mb-0">{{ session.name }}</h6>
+                    <span class="user-role">{{ session.role }}</span>
+                </div>
+            </div>
+            <ul class="list-unstyled components">
+                <li>
+                    <a href="{{ url_for('dashboard') }}" class="{% if request.path == '/dashboard' %}active{% endif %}">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('teacher') }}" class="{% if request.path == '/teacher' %}active{% endif %}">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Teachers
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('subject') }}" class="{% if request.path == '/subject' %}active{% endif %}">
+                        <i class="fas fa-book me-2"></i>Subjects
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('sections') }}" class="{% if request.path == '/sections' %}active{% endif %}">
+                        <i class="fas fa-th-large me-2"></i>Sections
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('classes') }}" class="{% if request.path == '/classes' %}active{% endif %}">
+                        <i class="fas fa-school me-2"></i>Classes
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('student') }}" class="{% if request.path == '/student' %}active{% endif %}">
+                        <i class="fas fa-user-graduate me-2"></i>Students
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('attendance') }}" class="{% if request.path == '/attendance' %}active{% endif %}">
+                        <i class="fas fa-calendar-check me-2"></i>Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('report') }}" class="{% if request.path == '/report' %}active{% endif %}">
+                        <i class="fas fa-chart-bar me-2"></i>Reports
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm w-100">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content" class="content">
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-light d-none d-md-block">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="d-flex align-items-center ms-auto">
+                        <div class="dropdown me-3">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    3
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Notifications</h6></li>
+                                <li><a class="dropdown-item" href="#">New student registered</a></li>
+                                <li><a class="dropdown-item" href="#">Attendance updated</a></li>
+                                <li><a class="dropdown-item" href="#">New report available</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="avatar-sm me-2">
+                                    <i class="fas fa-user-circle fa-2x"></i>
+                                </div>
+                                <div class="d-none d-sm-block">
+                                    <div class="fw-bold">{{ session.name }}</div>
+                                    <small class="text-muted">{{ session.role }}</small>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="container-fluid px-4 py-3">
+                <div class="row">
+                    <div class="col">
+                        <h1 class="page-title">{% block header %}Dashboard{% endblock %}</h1>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                                {% block breadcrumb %}
+                                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                                {% endblock %}
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="container-fluid px-4 pb-5">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer mt-auto py-3 bg-light">
+                <div class="container-fluid px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Jarvin CMS &copy; 2023</span>
+                        <span class="text-muted">Version 1.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    {% else %}
+    <!-- Login content -->
+    <div class="auth-wrapper">
+        {% block login_content %}{% endblock %}
+    </div>
+    {% endif %}
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

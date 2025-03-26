@@ -1,76 +1,396 @@
-{% include 'header.html' %}
-<script src="{{ url_for('static',filename='js/teacher.js') }}"></script>
-<body>
- {% include 'top_menus.html' %}
-  <div class="container">        
-      {% include 'left_menus.html' %}    
-	  <div class="content">
-		<div class="container-fluid">   	
-			<div class="row">
-			<a href="#"><strong><span class="ti-crown"></span> Teachers Section</strong></a>
-			<hr>	
-			<div class="float-right mb-2 col-md-2">
-				<button type="button" id="addTeacher" class="btn btn-info" title="Add teacher"><span class="glyphicon glyphicon-plus">Add</span></button>
-			</div>
-			<br><br>
-			<table class="table table-striped">
-			<thead>
-			  <tr>
-				<th>id</th>
-				<th>Name</th>
-				<th>Specialization</th>				
-				<th></th>
-				<th></th>				
-			  </tr>
-			</thead>
-			<tbody>
-			  {% for teacher in teachers %}
-			  <tr>
-				<td>{{teacher.teacher_id}}</td>
-				<td>{{teacher.teacher}}</td>
-				<td>{{teacher.subject}}</td>						
-				<td><a href="{{url_for('edit_teacher', teacher_id=teacher.teacher_id)}}" id="{{teacher.teacher_id}}" class="btn btn-primary update">Edit</a></td>
-				<td><a href="{{url_for('delete_teacher', teacher_id=teacher.teacher_id)}}" class="btn btn-danger">Delete</a></td>
-			  </tr> 
-			{% endfor %}	  
-			</tbody>
-		  </table>	        
-        <hr> 
-			</div>
-		</div>	
-	</div>	
-  </div>
-  <div id="teacherModal" class="modal fade">
-		<div class="modal-dialog">
-			<form method="post" id="teacherForm" action="{{ url_for('save_teacher')}}">
-				<div class="modal-content">
-					<div class="modal-header">						
-						<h4 class="modal-title"><i class="fa fa-plus"></i> Edit teacher</h4>
-					</div>
-					<div class="modal-body">					
-						<div class="form-group">							
-							<label for="Techer" class="control-label">Techer</label>						
-							<input type="text" name="techer_name" id="techer_name" autocomplete="off" class="form-control" placeholder="techer name"/>										
-						</div>						
-						<div class="form-group">
-							<label for="Specialization" class="control-label">Specialization</label>				
-							<select class="form-control" id="specialization" name="specialization"/>
-								<option value="">--Select--</option>
-								{% for subject in subjects %}
-									<option value="{{subject.subject_id}}">{{subject.subject}}</option>		
-								{% endfor %}								
-							</select>							
-						</div>												
-					</div>
-					<div class="modal-footer">
-						<input type="hidden" name="teacherid" id="teacherid" />						
-						<input type="hidden" name="action" id="action" value="" />
-						<input type="submit" name="save" id="save" class="btn btn-info" value="Save" />
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
-  </body>
-</html>
+{% extends 'layout.html' %}
+{% block title %}Teacher Management{% endblock %}
+{% block header %}Teacher Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+<li class="breadcrumb-item active" aria-current="page">Teachers</li>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row fade-in">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Teachers</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalTeachers">{{ teachers|length }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="javascript:void(0);" class="text-primary text-decoration-none small" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                    Add New <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Subjects Covered</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="subjectsCovered">{{ subjects|length }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('subject') }}" class="text-success text-decoration-none small">
+                    View Details <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Teacher-Student Ratio</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">1:25</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('student') }}" class="text-warning text-decoration-none small">
+                    View Students <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Teaching Efficiency</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">93%</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('report') }}" class="text-info text-decoration-none small">
+                    View Reports <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Teacher List Card -->
+    <div class="col-xl-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-list me-1"></i> Teacher List
+                </h6>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                    <i class="fas fa-plus me-1"></i> Add Teacher
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Teacher Name</th>
+                                <th scope="col">Subject</th>
+                                <th scope="col" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for teacher in teachers %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary-light text-primary rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        {{ teacher.teacher }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if teacher.subject %}
+                                    <span class="badge bg-info">{{ teacher.subject }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Not Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('edit_teacher') }}?teacher_id={{ teacher.teacher_id }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('delete_teacher') }}?teacher_id={{ teacher.teacher_id }}" class="btn btn-sm btn-outline-danger btn-delete" data-bs-toggle="tooltip" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not teachers %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="text-center">
+                                        <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
+                                        <h5>No teachers found</h5>
+                                        <p class="text-muted">Add a new teacher to get started</p>
+                                        <button type="button" class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                                            <i class="fas fa-plus me-1"></i> Add Teacher
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Showing {{ teachers|length }} teachers</span>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="printSection('teacherTable')">
+                        <i class="fas fa-print me-1"></i> Print List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="col-xl-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie me-1"></i> Subject Distribution
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-header">Chart Options:</div>
+                        <a class="dropdown-item" href="#" onclick="updateChart('pie')">Pie Chart</a>
+                        <a class="dropdown-item" href="#" onclick="updateChart('doughnut')">Doughnut Chart</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="printSection('chartContainer')">Export Chart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="chartContainer" class="chart-container">
+                    <canvas id="subjectDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tasks me-1"></i> Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="javascript:void(0);" class="card action-card h-100 text-decoration-none" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Add Teacher</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('subject') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-success-light text-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Manage Subjects</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('classes') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-warning-light text-warning rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Assign Classes</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('report') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-info-light text-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Performance Reports</h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Teacher Modal -->
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addTeacherModalLabel">Add New Teacher</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('save_teacher') }}" method="post" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="techer_name" class="form-label">Teacher Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="techer_name" name="techer_name" required>
+                        <div class="invalid-feedback">
+                            Please enter a teacher name.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="specialization" class="form-label">Specialization <span class="text-danger">*</span></label>
+                        <select class="form-select" id="specialization" name="specialization" required>
+                            <option value="">Select a subject</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.subject_id }}">{{ subject.subject }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a subject.
+                        </div>
+                    </div>
+                    <input type="hidden" name="action" value="addTeacher">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Teacher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Subject distribution chart
+    const ctx = document.getElementById('subjectDistributionChart').getContext('2d');
+    
+    // Collect data from the teachers
+    const subjectCounts = {};
+    const subjectColors = [
+        'rgba(78, 115, 223, 0.8)',
+        'rgba(28, 200, 138, 0.8)',
+        'rgba(246, 194, 62, 0.8)',
+        'rgba(54, 185, 204, 0.8)',
+        'rgba(231, 74, 59, 0.8)',
+        'rgba(133, 135, 150, 0.8)',
+        'rgba(105, 153, 255, 0.8)',
+        'rgba(255, 153, 102, 0.8)'
+    ];
+    
+    // Get subject counts
+    {% for teacher in teachers %}
+    const subject = "{{ teacher.subject|default('Not Assigned') }}";
+    if (subjectCounts[subject]) {
+        subjectCounts[subject]++;
+    } else {
+        subjectCounts[subject] = 1;
+    }
+    {% endfor %}
+    
+    const subjects = Object.keys(subjectCounts);
+    const counts = Object.values(subjectCounts);
+    const backgroundColors = subjects.map((_, index) => subjectColors[index % subjectColors.length]);
+    
+    // Create the chart
+    const subjectChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: subjects,
+            datasets: [{
+                data: counts,
+                backgroundColor: backgroundColors,
+                borderColor: 'white',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 20,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+    
+    // Function to update chart type
+    window.updateChart = function(chartType) {
+        subjectChart.config.type = chartType;
+        subjectChart.update();
+    };
+});
+</script>
+{% endblock %}

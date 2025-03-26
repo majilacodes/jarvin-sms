@@ -1,159 +1,135 @@
-{% include 'header.html' %}
-<script src="{{ url_for('static',filename='js/students.js') }}"></script>
-<body>
- {% include 'top_menus.html' %}
-  <div class="container">        
-      {% include 'left_menus.html' %}    
-	  <div class="content">
-		<div class="container-fluid">   	
-			<div class="row">
-				<a href="#"><strong><span class="ti-crown"></span> Student Section</strong></a>
-				<hr>		
-				<div class="panel-heading">
-					<div class="row">
-						<div class="col-md-10">
-							<h3 class="panel-title"></h3>
-						</div>
-						<div class="col-md-2" align="right">
-							<button type="button" name="add" id="addStudent" class="btn btn-success btn-xs">Student Admission</button>
-						</div>
-					</div>
-				</div>
-				<table id="studentList" class="table table-bordered table-striped">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Reg No</th>
-							<th>Roll No</th>	
-							<th>Name</th>
-							<th>Photo</th>	
-							<th>Class</th>
-							<th>Section</th>							
-							<th></th>
-							<th></th>							
-						</tr>
-					</thead>
-					<tbody>
-					  {% for student in students %}
-					  <tr>
-						<td>{{student.id}}</td>
-						<td>{{student.admission_no}}</td>
-						<td>{{student.roll_no}}</td>
-						<td>{{student.name}}</td>
-						<td>{{student.photo}}</td>						
-						<td>{{student.class}}</td>
-						<td>{{student.section}}</td>
-						<td>{{student.section}}</td>						
-						<td><a href="{{url_for('edit_student', student_id=student.id)}}" class="btn btn-primary update">Edit</a></td>
-						<td><a href="{{url_for('delete_student', student_id=student.id)}}" class="btn btn-danger">Delete</a></td>
-					  </tr> 
-					{% endfor %}	  
-					</tbody>
-				</table>
-			</div>
-		</div>	
-	</div>
-  </div>
-  <div id="studentModal" class="modal fade">
-	<div class="modal-dialog">
-		<form method="post" id="studentForm" enctype="multipart/form-data" action="{{ url_for('save_student')}}">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title"><i class="fa fa-plus"></i> Edit Student</h4>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="mobile" class="control-label">Admission Number</label>							
-						<input type="number" class="form-control" id="registerNo" name="registerNo" placeholder="Admission Number..">							
-					</div>	
-					<div class="form-group">
-						<label for="mobile" class="control-label">Roll Number</label>							
-						<input type="number" class="form-control" id="rollNo" name="rollNo" placeholder="Roll Number..">							
-					</div>	
-					<div class="form-group">
-						<label for="mname" class="control-label">Academic Year*</label>	
-						<select name="year" id="year" class="form-control" required>
-							<option value="">Select Year</option>
-							<option value="2018">2018</option>
-							<option value="2019">2019</option>
-							<option value="2020">2020</option>
-							<option value="2021">2021</option>
-							<option value="2022">2022</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="email" class="control-label">Admission Date</label>							
-						<input type="text" class="form-control"  id="admission_date" name="admission_date" placeholder="mm/dd/yyyy">							
-					</div>		
-					<div class="form-group">
-						<label for="mname" class="control-label">Class*</label>	
-						<select name="classid" id="classid" class="form-control" required>
-							<option value="">--Select--</option>
-							{% for class in classes %}
-								<option value="{{class.id}}">{{class.name}}</option>		
-							{% endfor %}
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="mname" class="control-label">Section</label>	
-						<select name="sectionid" id="sectionid" class="form-control" required>
-							<option value="">--Select--</option>
-							{% for section in sections %}
-								<option value="{{section.section_id}}">{{section.section}}</option>		
-							{% endfor %}
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="firstname" class="control-label">Name*</label>
-						<input type="text" class="form-control" id="sname" name="sname" placeholder="Student Name" required>				
-					</div>	
-					<div class="form-group">
-						<label for="firstname" class="control-label">Photo*</label>
-						<input type="file" class="form-control" id="photo" name="photo" placeholder="Student photo" required>				
-					</div>					
-					<div class="form-group">
-						<label for="gender" class="control-label">Gender</label>				
-						<select class="form-control" id="gender" name="gender"/>
-							<option value="">--Select--</option>							
-							<option value="male">Male</option>
-							<option value="female">Female</option>							
-						</select>							
-					</div>	
-					<div class="form-group">
-						<label for="email" class="control-label">Date of Birth</label>							
-						<input type="text" class="form-control"  id="dob" name="dob" placeholder="mm/dd/yyyy">							
-					</div>	
-					<div class="form-group">
-						<label for="email" class="control-label">Email</label>							
-						<input type="email" class="form-control"  id="email" name="email" placeholder="Email">							
-					</div>	
-					<div class="form-group">
-						<label for="mobile" class="control-label">Mobile</label>							
-						<input type="number" class="form-control" id="mobile" name="mobile" placeholder="Mobile">							
-					</div>		
-					<div class="form-group">
-						<label for="address" class="control-label">Address</label>							
-						<textarea class="form-control" rows="2" id="address" name="address" placeholder="Address"></textarea>							
-					</div>
-					<div class="form-group">
-						<label for="fname" class="control-label">Father Name</label>							
-						<input type="text" class="form-control" id="fname" name="fname" placeholder="Father name...">							
-					</div>	
-					<div class="form-group">
-						<label for="mname" class="control-label">Mother Name</label>							
-						<input type="text" class="form-control" id="mname" name="mname" placeholder="Mother Name...">						
-					</div>									
-				</div>
-				<div class="modal-footer">
-					<input type="hidden" name="studentid" id="studentid" />
-					<input type="hidden" name="action" id="action" value="" />
-					<input type="submit" name="save" id="save" class="btn btn-info" value="Save" />
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</form>
-		</div>
-	</div>
-  </body>
-</html>
+{% extends 'layout.html' %}
+{% block title %}Student Management{% endblock %}
+{% block header %}Student Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+<li class="breadcrumb-item active" aria-current="page">Students</li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list me-1"></i> Student List
+        </h6>
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> Add Student
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-8 col-xl-6">
+                <form method="get" action="{{ url_for('student') }}" class="d-flex align-items-center">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" name="search" value="{{ search_query }}" class="form-control" 
+                               placeholder="Search by name, admission number or roll number">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        {% if search_query %}
+                        <a href="{{ url_for('student') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i> Clear
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4 col-xl-6 mt-3 mt-md-0 text-md-end">
+                <button class="btn btn-outline-secondary me-2" onclick="printSection('studentTable')">
+                    <i class="fas fa-print me-1"></i> Print
+                </button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Filter by Class</h6></li>
+                        {% for class in classes %}
+                        <li><a class="dropdown-item" href="{{ url_for('student') }}?class={{ class.id }}">{{ class.name }}</a></li>
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Filter by Section</h6></li>
+                        {% for section in sections %}
+                        <li><a class="dropdown-item" href="{{ url_for('student') }}?section={{ section.section_id }}">{{ section.section }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        {% if search_query %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-1"></i> Showing results for: <strong>{{ search_query }}</strong>
+        </div>
+        {% endif %}
+        
+        <div class="table-responsive" id="studentTable">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Photo</th>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Admission No</th>
+                        <th scope="col">Roll No</th>
+                        <th scope="col">Class</th>
+                        <th scope="col">Section</th>
+                        <th scope="col" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% if student.photo %}
+                            <img src="{{ url_for('static', filename=student.photo) }}" alt="{{ student.name }}" 
+                                 class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user text-secondary"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.admission_no }}</td>
+                        <td>{{ student.roll_no }}</td>
+                        <td>{{ student.class }}</td>
+                        <td>{{ student.section }}</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="View Profile">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('edit_student') }}?student_id={{ student.id }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('delete_student') }}?student_id={{ student.id }}" class="btn btn-sm btn-outline-danger btn-delete" data-bs-toggle="tooltip" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not students %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <div class="text-center">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h5>No students found</h5>
+                                <p class="text-muted">Try changing your search criteria or add a new student</p>
+                                <a href="{{ url_for('add_student') }}" class="btn btn-primary btn-sm mt-2">
+                                    <i class="fas fa-plus me-1"></i> Add Student
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

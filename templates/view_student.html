@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+{% block title %}Student Profile - {{ student.name }}{% endblock %}
+{% block header %}Student Profile{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('student') }}">Students</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ student.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user-graduate me-1"></i> Student Information
+                </h6>
+                <div>
+                    <a href="{{ url_for('student') }}" class="btn btn-secondary btn-sm me-2">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                    <a href="{{ url_for('edit_student') }}?student_id={{ student.id }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="profile-image-container mb-3">
+                            {% if student.photo %}
+                            <img src="{{ url_for('static', filename=student.photo) }}" alt="{{ student.name }}" class="img-profile rounded-circle img-thumbnail" style="width: 200px;">
+                            {% else %}
+                            <div class="border p-3 text-center" style="width: 200px; height: 200px;">
+                                <i class="fa fa-user fa-5x text-muted mt-5"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h3>{{ student.name }}</h3>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p><strong>Admission No:</strong> {{ student.admission_no }}</p>
+                                <p><strong>Roll No:</strong> {{ student.roll_no }}</p>
+                                <p><strong>Class:</strong> {{ student.class_name }}</p>
+                                <p><strong>Section:</strong> {{ student.section_name }}</p>
+                                <p><strong>Gender:</strong> {{ student.gender }}</p>
+                                <p><strong>Date of Birth:</strong> {{ student.dob }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Admission Date:</strong> {{ student.admission_date }}</p>
+                                <p><strong>Academic Year:</strong> {{ student.academic_year }}</p>
+                                <p><strong>Mobile:</strong> {{ student.mobile }}</p>
+                                <p><strong>Email:</strong> {{ student.email }}</p>
+                                <p><strong>Father's Name:</strong> {{ student.father_name }}</p>
+                                <p><strong>Mother's Name:</strong> {{ student.mother_name }}</p>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <p><strong>Address:</strong> {{ student.current_address }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>Attendance History</h4>
+                    <form method="post" action="{{ url_for('student_history') }}" class="mb-3">
+                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                        <button type="submit" class="btn btn-info btn-sm">View Complete Academic History</button>
+                    </form>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in attendance %}
+                                <tr>
+                                    <td>{{ record.attendance_date }}</td>
+                                    <td>
+                                        {% if record.attendance_status == 'present' %}
+                                        <span class="badge bg-success text-white">Present</span>
+                                        {% else %}
+                                        <span class="badge bg-danger text-white">Absent</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not attendance %}
+                                <tr>
+                                    <td colspan="2" class="text-center">No attendance records found</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

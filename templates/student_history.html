@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+{% block title %}Academic History - {{ student.name }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">Academic History</div>
+            <div class="col-md-6 text-right">
+                <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-secondary btn-sm">Back to Profile</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h4>{{ student.name }}</h4>
+                <p><strong>Admission No:</strong> {{ student.admission_no }}</p>
+                <p><strong>Roll No:</strong> {{ student.roll_no }}</p>
+                <p><strong>Class:</strong> {{ student.class_name }}</p>
+                <p><strong>Section:</strong> {{ student.section_name }}</p>
+            </div>
+            <div class="col-md-6">
+                <h4>Academic Summary</h4>
+                <p><strong>Academic Year:</strong> {{ student.academic_year }}</p>
+                <p><strong>Admission Date:</strong> {{ student.admission_date }}</p>
+                <div class="card bg-light p-3 mt-2">
+                    <h5 class="mb-3">Attendance Statistics</h5>
+                    <div class="row">
+                        <div class="col">
+                            <p><strong>Total Days:</strong> {{ attendance_stats.total_days or 0 }}</p>
+                            <p><strong>Present:</strong> {{ attendance_stats.present_days or 0 }}</p>
+                            <p><strong>Absent:</strong> {{ attendance_stats.absent_days or 0 }}</p>
+                            {% if attendance_stats.total_days %}
+                            <p><strong>Attendance Rate:</strong> 
+                                {% set rate = (attendance_stats.present_days / attendance_stats.total_days * 100)|round(2) %}
+                                {{ rate }}%
+                            </p>
+                            {% else %}
+                            <p><strong>Attendance Rate:</strong> N/A</p>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            {% if attendance_stats.total_days %}
+                            <div class="progress" style="height: 20px;">
+                                {% set rate = (attendance_stats.present_days / attendance_stats.total_days * 100)|round %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ rate }}%;" aria-valuenow="{{ rate }}" aria-valuemin="0" aria-valuemax="100">{{ rate }}%</div>
+                            </div>
+                            {% else %}
+                            <div class="text-muted">No attendance data available</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h4>Academic Timeline</h4>
+            <div class="list-group">
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Enrolled in {{ student.class_name }} - {{ student.section_name }}</h5>
+                        <small>{{ student.admission_date }}</small>
+                    </div>
+                    <p class="mb-1">Started {{ student.academic_year }} academic year</p>
+                </div>
+                <!-- Additional timeline items would be populated here from academic records -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

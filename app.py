@@ -409,10 +409,30 @@ def delete_sections():
 @app.route("/student", methods =['GET', 'POST'])
 def student():
     if 'loggedin' in session:       
+        search_query = request.args.get('search', '')
         
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT s.id, s.admission_no, s.roll_no, s.name, s.photo, c.name AS class, sec.section FROM sms_students s LEFT JOIN sms_section sec ON sec.section_id = s.section LEFT JOIN sms_classes c ON c.id = s.class')
+        
+        if search_query:
+            search_param = f'%{search_query}%'
+            cursor.execute('''
+                SELECT s.id, s.admission_no, s.roll_no, s.name, s.photo, 
+                       c.name AS class, sec.section 
+                FROM sms_students s 
+                LEFT JOIN sms_section sec ON sec.section_id = s.section 
+                LEFT JOIN sms_classes c ON c.id = s.class
+                WHERE s.name LIKE ? OR s.admission_no LIKE ? OR s.roll_no LIKE ?
+            ''', (search_param, search_param, search_param))
+        else:
+            cursor.execute('''
+                SELECT s.id, s.admission_no, s.roll_no, s.name, s.photo, 
+                       c.name AS class, sec.section 
+                FROM sms_students s 
+                LEFT JOIN sms_section sec ON sec.section_id = s.section 
+                LEFT JOIN sms_classes c ON c.id = s.class
+            ''')
+        
         students = cursor.fetchall() 
         
         cursor.execute('SELECT * FROM sms_classes')
@@ -422,7 +442,7 @@ def student():
         sections = cursor.fetchall()
         
         db.close()
-        return render_template("student.html", students = students, classes = classes, sections = sections)
+        return render_template("student.html", students=students, classes=classes, sections=sections, search_query=search_query)
     return redirect(url_for('login')) 
     
 @app.route("/edit_student", methods =['GET'])
@@ -449,22 +469,76 @@ def save_student():
     if 'loggedin' in session:    
         db = get_db()
         cursor = db.cursor()        
-        if request.method == 'POST' and 'section_name' in request.form:
-            section_name = request.form['section_name']                         
+        if request.method == 'POST' and 'name' in request.form and 'class_id' in request.form and 'section_id' in request.form:
+            admission_no = request.form['admission_no']
+            roll_no = request.form['roll_no']
+            name = request.form['name']
+            gender = request.form['gender']
+            dob = request.form['dob']
+            mobile = request.form['mobile']
+            email = request.form['email']
+            current_address = request.form['current_address']
+            father_name = request.form['father_name']
+            mother_name = request.form['mother_name']
+            admission_date = request.form['admission_date']
+            academic_year = request.form['academic_year']
+            class_id = request.form['class_id']
+            section_id = request.form['section_id']
+            
+            # Handle photo upload
+            photo = ""
+            if 'photo' in request.files:
+                photo_file = request.files['photo']
+                if photo_file.filename != '':
+                    # Create uploads directory if it doesn't exist
+                    if not os.path.exists('static/uploads'):
+                        os.makedirs('static/uploads')
+                    photo = f"uploads/{admission_no}_{photo_file.filename}"
+                    photo_file.save(os.path.join('static', photo))
+            
             action = request.form['action']             
             
             if action == 'updateStudent':
-                section_id = request.form['sectionid'] 
-                cursor.execute('UPDATE sms_section SET section = ? WHERE section_id  =?', (section_name, section_id))
+                student_id = request.form['student_id']
+                if photo:
+                    cursor.execute('''
+                        UPDATE sms_students 
+                        SET admission_no=?, roll_no=?, name=?, gender=?, dob=?, 
+                            mobile=?, email=?, current_address=?, father_name=?, 
+                            mother_name=?, admission_date=?, academic_year=?, 
+                            class=?, section=?, photo=? 
+                        WHERE id=?
+                    ''', (admission_no, roll_no, name, gender, dob, mobile, email, 
+                         current_address, father_name, mother_name, admission_date, 
+                         academic_year, class_id, section_id, photo, student_id))
+                else:
+                    cursor.execute('''
+                        UPDATE sms_students 
+                        SET admission_no=?, roll_no=?, name=?, gender=?, dob=?, 
+                            mobile=?, email=?, current_address=?, father_name=?, 
+                            mother_name=?, admission_date=?, academic_year=?, 
+                            class=?, section=? 
+                        WHERE id=?
+                    ''', (admission_no, roll_no, name, gender, dob, mobile, email, 
+                         current_address, father_name, mother_name, admission_date, 
+                         academic_year, class_id, section_id, student_id))
             else: 
-                cursor.execute('INSERT INTO sms_section (section) VALUES (?)', (section_name, ))
+                cursor.execute('''
+                    INSERT INTO sms_students 
+                    (admission_no, roll_no, name, photo, gender, dob, mobile, 
+                     email, current_address, father_name, mother_name, 
+                     admission_date, academic_year, class, section) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (admission_no, roll_no, name, photo, gender, dob, mobile, 
+                     email, current_address, father_name, mother_name, 
+                     admission_date, academic_year, class_id, section_id))
             
             db.commit()
             db.close()
-            return redirect(url_for('sections'))        
+            return redirect(url_for('student'))        
         elif request.method == 'POST':
-            msg = 'Please fill out the form field !'        
-        return redirect(url_for('sections'))        
+            msg = 'Please fill out all required fields!'        
+        return redirect(url_for('student'))        
     return redirect(url_for('login'))     
     
 @app.route("/delete_student", methods =['GET'])
@@ -479,6 +553,88 @@ def delete_student():
         return redirect(url_for('student'))
     return redirect(url_for('login'))  
 
+@app.route("/add_student", methods =['GET'])
+def add_student():
+    if 'loggedin' in session:
+        db = get_db()
+        cursor = db.cursor()
+        
+        cursor.execute('SELECT * FROM sms_classes')
+        classes = cursor.fetchall() 
+        
+        cursor.execute('SELECT * FROM sms_section')
+        sections = cursor.fetchall()
+        
+        db.close()
+        return render_template("add_student.html", classes=classes, sections=sections)
+    return redirect(url_for('login'))
+
+@app.route("/view_student/<int:student_id>", methods=['GET'])
+def view_student(student_id):
+    if 'loggedin' in session:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('''
+            SELECT s.*, c.name AS class_name, sec.section AS section_name 
+            FROM sms_students s 
+            LEFT JOIN sms_section sec ON sec.section_id = s.section 
+            LEFT JOIN sms_classes c ON c.id = s.class 
+            WHERE s.id = ?
+        ''', (student_id,))
+        student = cursor.fetchone()
+        
+        # Get attendance records
+        cursor.execute('''
+            SELECT * FROM sms_attendance 
+            WHERE student_id = ? 
+            ORDER BY attendance_date DESC
+        ''', (student_id,))
+        attendance = cursor.fetchall()
+        
+        db.close()
+        
+        if student:
+            return render_template("view_student.html", student=student, attendance=attendance)
+        else:
+            return redirect(url_for('student'))
+    return redirect(url_for('login'))
+
+# Add academic history tracking
+@app.route("/student_history", methods=['GET', 'POST'])
+def student_history():
+    if 'loggedin' in session:
+        if request.method == 'POST' and 'student_id' in request.form:
+            student_id = request.form['student_id']
+            db = get_db()
+            cursor = db.cursor()
+            
+            cursor.execute('''
+                SELECT s.*, c.name AS class_name, sec.section AS section_name 
+                FROM sms_students s 
+                LEFT JOIN sms_section sec ON sec.section_id = s.section 
+                LEFT JOIN sms_classes c ON c.id = s.class 
+                WHERE s.id = ?
+            ''', (student_id,))
+            student = cursor.fetchone()
+            
+            # Get attendance statistics
+            cursor.execute('''
+                SELECT 
+                    COUNT(*) as total_days,
+                    SUM(CASE WHEN attendance_status = 'present' THEN 1 ELSE 0 END) as present_days,
+                    SUM(CASE WHEN attendance_status = 'absent' THEN 1 ELSE 0 END) as absent_days
+                FROM sms_attendance 
+                WHERE student_id = ?
+            ''', (student_id,))
+            attendance_stats = cursor.fetchone()
+            
+            db.close()
+            
+            if student:
+                return render_template("student_history.html", student=student, attendance_stats=attendance_stats)
+        
+        return redirect(url_for('student'))
+    return redirect(url_for('login'))
 
 @app.route("/attendance", methods =['GET', 'POST'])
 def attendance():

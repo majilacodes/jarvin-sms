@@ -1,177 +1,499 @@
-{% include 'header.html' %}
-<body>
- {% include 'top_menus.html' %}
-  <div class="container">        
-      {% include 'left_menus.html' %}    
-	  <div class="content">
-		<div class="container-fluid">    			
-			<div class="alert alert-success fade in">
-			  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-			  <strong><span class="ti ti-announcement fa-2x"></span> </strong> <strong>&nbsp;&nbsp;Welcome to your Admin Dashboard!!</strong>.
-			</div>						
-			<div class="row"><!--row begins-->
-				<div class="col-lg-3 col-sm-6">
-					<div class="card">
-						<div class="content">
-							<div class="row">
-								<div class="col-xs-5">
-									<div class="icon-big icon-warning text-center">
-										<i class="ti-user"></i>
-									</div>
-								</div>
-								<div class="col-xs-7">
-									<div class="numbers">
-										<p><strong>Students</strong></p>										
-									</div>
-								</div>
-							</div>
-							<a href="{{ url_for('student') }}">
-								<div class="footer">
-								<hr />
-								<div class="stats">
-									<i class="ti-arrow-right"></i>View
-								</div>
-							</div>
-						</a>
-						</div>
-					</div>
-				</div>				
-				<div class="col-lg-3 col-sm-6">
-					<div class="card">
-						<div class="content">
-							<div class="row">
-								<div class="col-xs-5">
-									<div class="icon-big icon-info text-center">
-										<i class="ti-id-badge"></i>
-									</div>
-								</div>
-								<div class="col-xs-7">
-									<div class="numbers">
-										<p><strong>Teachers</strong></p>									   
-									</div>
-								</div>
-							</div>
-							<a href="{{ url_for('teacher') }}">
-								<div class="footer">
-								<hr />
-								<div class="stats">
-									<i class="ti-arrow-right"></i>View
-								</div>
-							</div>
-						</a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-3 col-sm-6">
-					<div class="card">
-						<div class="content">
-							<div class="row">
-								<div class="col-xs-5">
-									<div class="icon-big icon-success text-center">
-										<i class="ti-crown"></i>
-									</div>
-								</div>
-								<div class="col-xs-7">
-									<div class="numbers">
-										<p><strong>Classes</strong></p>										
-									</div>
-								</div>
-							</div>
-							<a href="{{ url_for('classes') }}">
-								<div class="footer">
-								<hr />
-								<div class="stats">
-									<i class="ti-arrow-right"></i>View
-								</div>
-							</div>
-						</a>
-						</div>
-					</div>
-				</div>
-			</div><!--row ends-->
-			<!--row begins-->
-				<div class="row">
-				<div class="col-lg-3 col-sm-6">
-					<div class="card">
-						<div class="content">
-							<div class="row">
-								<div class="col-xs-5">
-									<div class="icon-big icon-warning text-center">
-										<i class="ti-harddrives"></i>
-									</div>
-								</div>
-								<div class="col-xs-7">
-									<div class="numbers">
-										<p><strong>Subjects</strong></p>									   
-									</div>
-								</div>
-							</div>
-							<a href="{{ url_for('subject') }}">
-								<div class="footer">
-								<hr />
-								<div class="stats">
-									<i class="ti-arrow-right"></i>View
-								</div>
-							</div>
-						</a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-3 col-sm-6">
-					<div class="card">
-						<div class="content">
-							<div class="row">
-								<div class="col-xs-5">
-									<div class="icon-big icon-success text-center">
-										<i class="ti-crown"></i>
-									</div>
-								</div>
-								<div class="col-xs-7">
-									<div class="numbers">
-										<p><strong>Sections</strong></p>										
-									</div>
-								</div>
-							</div>
-							<a href="{{ url_for('sections') }}">
-								<div class="footer">
-								<hr />
-								<div class="stats">
-									<i class="ti-arrow-right"></i>View
-								</div>
-							</div>
-						</a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-3 col-sm-6">
-					<div class="card">
-						<div class="content">
-							<div class="row">
-								<div class="col-xs-5">
-									<div class="icon-big icon-danger text-center">
-										<i class="ti-blackboard"></i>
-									</div>
-								</div>
-								<div class="col-xs-7">
-									<div class="numbers">
-										<p><strong>Attendance</strong></p>										
-									</div>
-								</div>
-							</div>
-							<a href="{{ url_for('attendance') }}">
-								<div class="footer">
-								<hr />
-								<div class="stats">
-									<i class="ti-arrow-right"></i>View
-								</div>
-							</div>
-						</a>
-						</div>
-					</div>
-				</div>				
-			</div>		
-		</div>	
-	</div>
-  </div>
-  </body>
-</html>
+{% extends 'layout.html' %}
+{% block title %}Dashboard - School Management System{% endblock %}
+{% block header %}Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row fade-in">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Students</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="studentCount">--</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('student') }}" class="text-primary text-decoration-none small">
+                    View Details <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Teachers</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="teacherCount">--</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('teacher') }}" class="text-success text-decoration-none small">
+                    View Details <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Classes</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="classCount">--</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-school fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('classes') }}" class="text-warning text-decoration-none small">
+                    View Details <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card card-stat border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Subjects</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="subjectCount">--</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="{{ url_for('subject') }}" class="text-info text-decoration-none small">
+                    View Details <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Attendance Overview -->
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-calendar-check me-1"></i> Today's Attendance
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="attendanceDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="attendanceDropdown">
+                        <div class="dropdown-header">Options:</div>
+                        <a class="dropdown-item" href="{{ url_for('attendance') }}">Take Attendance</a>
+                        <a class="dropdown-item" href="{{ url_for('report') }}">View Reports</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="printSection('attendanceCard')">Print</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" id="attendanceCard">
+                <div class="row mb-4">
+                    <div class="col-4 text-center">
+                        <div class="attendance-circle bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                            <span id="totalAttendance" class="h3 mb-0">--</span>
+                        </div>
+                        <p class="mt-2 mb-0">Total</p>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="attendance-circle bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                            <span id="presentCount" class="h3 mb-0 text-success">--</span>
+                        </div>
+                        <p class="mt-2 mb-0">Present</p>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="attendance-circle bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                            <span id="absentCount" class="h3 mb-0 text-danger">--</span>
+                        </div>
+                        <p class="mt-2 mb-0">Absent</p>
+                    </div>
+                </div>
+                <div class="text-center mb-3">
+                    <h5>Attendance Rate</h5>
+                    <div class="progress" style="height: 20px;">
+                        <div id="attendanceProgress" class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+                <a href="{{ url_for('attendance') }}" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-clipboard-list me-1"></i> Take Attendance
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-area me-1"></i> Attendance Overview
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="chartDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="chartDropdown">
+                        <div class="dropdown-header">View By:</div>
+                        <a class="dropdown-item active" href="#" data-period="week">This Week</a>
+                        <a class="dropdown-item" href="#" data-period="month">This Month</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="printSection('attendanceChart')">Export Chart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" id="attendanceChart">
+                    <canvas id="attendanceLineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Students -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-users me-1"></i> Recent Students
+                </h6>
+                <a href="{{ url_for('student') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i> Add New
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentStudents">
+                            <tr>
+                                <td colspan="4" class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    Loading students...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light py-2">
+                <a href="{{ url_for('student') }}" class="text-decoration-none small">
+                    View all students <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tasks me-1"></i> Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{{ url_for('add_student') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Add Student</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ url_for('teacher') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-success-light text-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Manage Teachers</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ url_for('attendance') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-warning-light text-warning rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Take Attendance</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ url_for('report') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-info-light text-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <h6 class="card-title mb-0">View Reports</h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle me-1"></i> System Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-left-primary h-100 py-2">
+                            <div class="card-body py-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Database Status</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <span class="badge bg-success">Connected</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-database fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-left-success h-100 py-2">
+                            <div class="card-body py-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            System Version</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">v1.0.4</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-code-branch fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-left-warning h-100 py-2">
+                            <div class="card-body py-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Last Login</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">Today</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-left-info h-100 py-2">
+                            <div class="card-body py-2">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Academic Year</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">2023-2024</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Dashboard Data Loading
+$(document).ready(function() {
+    // Load counts with animation
+    function animateCounter(elementId, finalValue, duration = 1000) {
+        const element = document.getElementById(elementId);
+        if(!element) return;
+        
+        let startValue = 0;
+        const increment = finalValue / (duration / 50);
+        
+        const timer = setInterval(() => {
+            startValue += increment;
+            if(startValue >= finalValue) {
+                clearInterval(timer);
+                startValue = finalValue;
+            }
+            element.textContent = Math.floor(startValue);
+        }, 50);
+    }
+    
+    // This is a placeholder - in a real app you would fetch this data via AJAX
+    // Sample data for demonstration
+    setTimeout(function() {
+        const students = 125;
+        const teachers = 18;
+        const classes = 12;
+        const subjects = 24;
+        
+        animateCounter('studentCount', students);
+        animateCounter('teacherCount', teachers);
+        animateCounter('classCount', classes);
+        animateCounter('subjectCount', subjects);
+        
+        const totalAttendance = students;
+        const presentCount = 118;
+        const absentCount = totalAttendance - presentCount;
+        const attendanceRate = Math.round((presentCount / totalAttendance) * 100);
+        
+        animateCounter('totalAttendance', totalAttendance);
+        animateCounter('presentCount', presentCount);
+        animateCounter('absentCount', absentCount);
+        
+        // Attendance progress bar
+        const progressBar = document.getElementById('attendanceProgress');
+        progressBar.style.width = attendanceRate + '%';
+        progressBar.innerText = attendanceRate + '%';
+        progressBar.setAttribute('aria-valuenow', attendanceRate);
+        
+        // Fill recent students table
+        var recentStudentsHtml = '';
+        var dummyStudents = [
+            {name: 'John Doe', class: 'Class 10', section: 'A', id: 1},
+            {name: 'Jane Smith', class: 'Class 9', section: 'B', id: 2},
+            {name: 'Alex Johnson', class: 'Class 8', section: 'C', id: 3},
+            {name: 'Emily Davis', class: 'Class 10', section: 'A', id: 4},
+            {name: 'Michael Brown', class: 'Class 7', section: 'D', id: 5}
+        ];
+        
+        dummyStudents.forEach(function(student) {
+            recentStudentsHtml += '<tr>' +
+                '<td><div class="d-flex align-items-center">' +
+                '<div class="avatar-sm me-2 bg-light rounded-circle text-center"><i class="fas fa-user"></i></div>' +
+                '<div>' + student.name + '</div>' +
+                '</div></td>' +
+                '<td>' + student.class + '</td>' +
+                '<td>' + student.section + '</td>' +
+                '<td><a href="/view_student/' + student.id + '" class="btn btn-sm btn-info">View</a></td>' +
+                '</tr>';
+        });
+        
+        $('#recentStudents').html(recentStudentsHtml);
+        
+        // Create attendance chart
+        const ctx = document.getElementById('attendanceLineChart').getContext('2d');
+        const attendanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                datasets: [{
+                    label: 'Present',
+                    data: [115, 110, 118, 112, 120, 0, 0],
+                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                    borderColor: '#1cc88a',
+                    pointBackgroundColor: '#1cc88a',
+                    tension: 0.3,
+                    borderWidth: 2,
+                    fill: true
+                }, {
+                    label: 'Absent',
+                    data: [10, 15, 7, 13, 5, 0, 0],
+                    backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                    borderColor: '#e74a3b',
+                    pointBackgroundColor: '#e74a3b',
+                    tension: 0.3,
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                }
+            }
+        });
+    }, 500);
+});
+</script>
+{% endblock %}
