@@ -1,71 +1,233 @@
-{% include 'header.html' %}
-<script src="{{ url_for('static',filename='js/sections.js') }}"></script>
-<body>
- {% include 'top_menus.html' %}
-  <div class="container">        
-      {% include 'left_menus.html' %}    
-	  <div class="content">
-		<div class="container-fluid">   	
-			<div class="row">
-				<a href="#"><strong><span class="ti-crown"></span> Classes Section</strong></a>
-				<hr>		
-				<div class="panel-heading">
-					<div class="row">
-						<div class="col-md-10">
-							<h3 class="panel-title"></h3>
-						</div>
-						<div class="col-md-2" align="right">
-							<button type="button" name="add" id="addSection" class="btn btn-success btn-xs">Add New Section</button>
-						</div>
-					</div>
-				</div>
-				<table id="sectionList" class="table table-bordered table-striped">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Name</th>											
-							<th></th>
-							<th></th>							
-						</tr>
-					</thead>
-					<tbody>
-					  {% for section in sections %}
-					  <tr>
-						<td>{{section.section_id}}</td>
-						<td>{{section.section}}</td>											
-						<td><a href="{{url_for('edit_sections', section_id=section.section_id)}}" id="{{section.section_id}}" class="btn btn-primary update">Edit</a></td>
-						<td><a href="{{url_for('delete_sections', section_id=section.section_id)}}" class="btn btn-danger">Delete</a></td>
-					  </tr> 
-					{% endfor %}	  
-					</tbody>
-				</table>
-			</div>
-		</div>	
-	</div>
-  </div>
-  <div id="sectionModal" class="modal fade">
-	<div class="modal-dialog">
-		<form method="post" id="sectionForm" action="{{ url_for('save_sections')}}">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title"><i class="fa fa-plus"></i> Edit Section</h4>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="firstname" class="control-label">Section Name*</label>
-						<input type="text" class="form-control" id="section_name" name="section_name" placeholder="Section Name" required>							
-					</div>									
-				</div>
-				<div class="modal-footer">
-					<input type="hidden" name="sectionid" id="sectionid" />
-					<input type="hidden" name="action" id="action" value="" />
-					<input type="submit" name="save" id="save" class="btn btn-info" value="Save" />
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</form>
-	</div>
- </div>
-</body>
-</html>
+{% extends 'layout.html' %}
+{% block title %}Sections - School Management System{% endblock %}
+{% block header %}Sections{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Sections</li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4 fade-in">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-layer-group me-1"></i> Manage Sections
+        </h6>
+        <button id="addSection" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus me-1"></i> Add Section
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="sectionList" class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Section Name</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for section in sections %}
+                    <tr>
+                        <td>{{section.section_id}}</td>
+                        <td>{{section.section}}</td>
+                        <td class="text-center">
+                            <a href="{{url_for('edit_sections', section_id=section.section_id)}}" id="{{section.section_id}}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{{url_for('delete_sections', section_id=section.section_id)}}" class="btn btn-sm btn-outline-danger" 
+                               onclick="return confirm('Are you sure you want to delete this section?')">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Section Stats -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow border-left-primary">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Sections</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sections|length }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-layer-group fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow border-left-info">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Organization Structure</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            Classes → Sections → Students
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-sitemap fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tasks me-1"></i> Section Management
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="#" id="quickAddSection" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <h6 class="card-title mb-0">Add New Section</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ url_for('classes') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-success-light text-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <h6 class="card-title mb-0">View Classes</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ url_for('student') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-warning-light text-warning rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <h6 class="card-title mb-0">View Students</h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Modal -->
+<div class="modal fade" id="sectionModal" tabindex="-1" aria-labelledby="sectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" id="sectionForm" action="{{ url_for('save_sections')}}">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="sectionModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i><span id="modalTitle">Add Section</span>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="section_name" class="form-label">Section Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="section_name" name="section_name" 
+                               placeholder="Enter section name" required>
+                        <div class="form-text text-muted">Example: Section A, Section B, etc.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="sectionid" id="sectionid">
+                    <input type="hidden" name="action" id="action" value="addSection">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#sectionList').DataTable({
+        "responsive": true,
+        "order": [[0, "desc"]],
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+    });
+    
+    // Add Section Button Click - Fixed
+    $("#addSection, #quickAddSection").on('click', function(e) {
+        e.preventDefault();
+        $('#modalTitle').text('Add Section');
+        $('#sectionForm')[0].reset();
+        $('#sectionid').val('');
+        $('#action').val('addSection');
+        $('#sectionModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        $('#sectionModal').modal('show');
+    });
+    
+    // Edit section button functionality
+    $(document).on('click', '.update', function(e){
+        e.preventDefault();
+        var section_id = $(this).attr("id");
+        $('#modalTitle').text('Edit Section');
+        $.ajax({
+            url: "/get_section/" + section_id,
+            method: "GET",
+            dataType: "json",
+            success: function(data) {
+                $('#section_name').val(data.section);
+                $('#sectionid').val(data.section_id);
+                $('#action').val('updateSection');
+                $('#sectionModal').modal('show');
+            }
+        });
+    });
+    
+    // Ensure Bootstrap 3 & 4 compatibility
+    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+    
+    // Animation for cards
+    $(".action-card").hover(
+        function() {
+            $(this).addClass('shadow-sm').css('transform', 'translateY(-5px)');
+        },
+        function() {
+            $(this).removeClass('shadow-sm').css('transform', 'translateY(0)');
+        }
+    );
+    
+    // Add smooth transition to cards
+    $(".action-card").css('transition', 'all 0.3s ease');
+});
+</script>
+{% endblock %}

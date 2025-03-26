@@ -1,0 +1,233 @@
+{% include 'header.html' %}
+<body class="dashboard-body">
+  {% include 'top_menus.html' %}
+  <div class="dashboard-container">        
+      {% include 'left_menus.html' %}    
+      <div class="dashboard-content">
+        <div class="container-fluid">
+            <h2 class="page-title">Allocate Resources</h2>   	
+            
+            <!-- Alert Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="row">
+                <!-- Resource Form -->
+                <div class="col-md-12">
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-header">
+                            <h3 class="box-title"><i class="fa fa-cubes"></i> Allocate New Resource</h3>
+                        </div>
+                        <form id="resourceForm" action="{{ url_for('allocate_resources') }}" method="post">
+                            <div class="dashboard-box-body">						
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="resource_id">Resource</label><small class="req"> *</small>
+                                            <select id="resource_id" name="resource_id" class="form-control dashboard-select" required>
+                                                <option value="">Select Resource</option>
+                                                {% for resource in resources %}								
+                                                    <option value="{{ resource.id }}">{{ resource.name }}</option>				
+                                                {% endfor %}												
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="subject_id">Course/Subject</label><small class="req"> *</small>
+                                            <select id="subject_id" name="subject_id" class="form-control dashboard-select" required>
+                                                <option value="">Select Course</option>
+                                                {% for subject in subjects %}
+                                                    <option value="{{ subject.id }}">{{ subject.name }}</option>	
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="quantity">Quantity</label><small class="req"> *</small>			
+                                            <input type="number" class="form-control dashboard-input" id="quantity" name="quantity" min="1" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="allocation_date">Allocation Date</label><small class="req"> *</small>			
+                                            <input type="date" class="form-control dashboard-input" id="allocation_date" name="allocation_date" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="return_date">Return Date</label><small class="req"> (optional)</small>			
+                                            <input type="date" class="form-control dashboard-input" id="return_date" name="return_date">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dashboard-box-footer">
+                                <button type="submit" class="btn btn-dashboard btn-sm"><i class="fa fa-save"></i> Allocate Resource</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resource Inventory -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-header">
+                            <h3 class="box-title"><i class="fa fa-database"></i> Resource Inventory</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-dashboard btn-sm" id="addResourceBtn">
+                                    <i class="fa fa-plus"></i> Add New Resource
+                                </button>
+                            </div>
+                        </div>
+                        <div class="dashboard-box-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Resource Name</th>
+                                            <th>Total Quantity</th>
+                                            <th>Available Quantity</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if resources %}
+                                            {% for resource in resources %}
+                                                <tr>
+                                                    <td>{{ resource.id }}</td>
+                                                    <td>{{ resource.name }}</td>
+                                                    <td>{{ resource.total_quantity }}</td>
+                                                    <td>{{ resource.available_quantity }}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-info edit-resource-btn" data-id="{{ resource.id }}">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger delete-resource-btn" data-id="{{ resource.id }}">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No resources found</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Current Allocations -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-header">
+                            <h3 class="box-title"><i class="fa fa-list"></i> Current Allocations</h3>
+                        </div>
+                        <div class="dashboard-box-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Resource</th>
+                                            <th>Course</th>
+                                            <th>Quantity</th>
+                                            <th>Allocation Date</th>
+                                            <th>Return Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if allocations %}
+                                            {% for allocation in allocations %}
+                                                <tr>
+                                                    <td>{{ allocation.id }}</td>
+                                                    <td>{{ allocation.resource_name }}</td>
+                                                    <td>{{ allocation.subject_name }}</td>
+                                                    <td>{{ allocation.quantity }}</td>
+                                                    <td>{{ allocation.allocation_date }}</td>
+                                                    <td>{{ allocation.return_date or 'Not set' }}</td>
+                                                    <td>
+                                                        {% if not allocation.return_date or allocation.return_date >= today %}
+                                                            <span class="label label-success">Active</span>
+                                                        {% else %}
+                                                            <span class="label label-danger">Returned</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-info edit-allocation-btn" data-id="{{ allocation.id }}">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger delete-allocation-btn" data-id="{{ allocation.id }}">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="8" class="text-center">No allocations found</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>	
+    </div>
+  </div>
+  
+  <!-- Resource Modal -->
+  <div class="modal fade" id="resourceModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Resource</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newResourceForm">
+                    <div class="form-group">
+                        <label for="resource_name">Resource Name</label>
+                        <input type="text" class="form-control" id="resource_name" name="resource_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="total_quantity">Total Quantity</label>
+                        <input type="number" class="form-control" id="total_quantity" name="total_quantity" min="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dashboard" id="saveResourceBtn">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+  <script src="{{ url_for('static', filename='js/course_faculty.js') }}"></script>
+</body>
+</html>

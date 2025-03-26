@@ -698,7 +698,198 @@ def report():
         db.close()
         return render_template("report.html", classes = classes, sections = sections)
     return redirect(url_for('login'))     
+
+# Course & Faculty Management routes
+@app.route('/course-faculty/assign', methods=['GET', 'POST'])
+def assign_faculty():
+    if not session.get('id'):
+        return redirect(url_for('login'))
     
+    courses = []
+    faculty = []
+    assignments = []
+    
+    # Get all courses
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM subjects ORDER BY name")
+    courses = cursor.fetchall()
+    
+    # Get all faculty/teachers
+    cursor.execute("SELECT * FROM teacher ORDER BY name")
+    faculty = cursor.fetchall()
+    
+    # Get existing assignments
+    cursor.execute("""
+        SELECT a.id, s.name as course_name, t.name as faculty_name, a.days, a.time_slot 
+        FROM faculty_assignments a 
+        JOIN subjects s ON a.subject_id = s.id 
+        JOIN teacher t ON a.teacher_id = t.id
+    """)
+    assignments = cursor.fetchall()
+    
+    # Handle assignment submission
+    if request.method == 'POST':
+        subject_id = request.form.get('subject_id')
+        teacher_id = request.form.get('teacher_id')
+        days = request.form.get('days')
+        time_slot = request.form.get('time_slot')
+        
+        # Validate input
+        if not all([subject_id, teacher_id, days, time_slot]):
+            flash('All fields are required', 'error')
+        else:
+            try:
+                cursor.execute(
+                    "INSERT INTO faculty_assignments (subject_id, teacher_id, days, time_slot) VALUES (%s, %s, %s, %s)",
+                    (subject_id, teacher_id, days, time_slot)
+                )
+                conn.commit()
+                flash('Faculty assigned successfully', 'success')
+                return redirect(url_for('assign_faculty'))
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'error')
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('course_faculty/assign.html', 
+                          courses=courses, 
+                          faculty=faculty, 
+                          assignments=assignments)
+
+@app.route('/course-faculty/schedules', methods=['GET', 'POST'])
+def manage_schedules():
+    if not session.get('id'):
+        return redirect(url_for('login'))
+    
+    schedules = []
+    
+    # Get all schedules
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT s.id, s.class_id, c.name as class_name, s.section_id, sec.section as section_name,
+               s.subject_id, sub.name as subject_name, s.day, s.start_time, s.end_time
+        FROM schedules s
+        JOIN classes c ON s.class_id = c.id
+        JOIN sections sec ON s.section_id = sec.section_id
+        JOIN subjects sub ON s.subject_id = sub.id
+        ORDER BY c.name, sec.section, s.day, s.start_time
+    """)
+    schedules = cursor.fetchall()
+    
+    # Get classes for dropdown
+    cursor.execute("SELECT * FROM classes ORDER BY name")
+    classes = cursor.fetchall()
+    
+    # Get sections for dropdown
+    cursor.execute("SELECT * FROM sections ORDER BY section")
+    sections = cursor.fetchall()
+    
+    # Get subjects for dropdown
+    cursor.execute("SELECT * FROM subjects ORDER BY name")
+    subjects = cursor.fetchall()
+    
+    # Handle schedule submission
+    if request.method == 'POST':
+        class_id = request.form.get('class_id')
+        section_id = request.form.get('section_id')
+        subject_id = request.form.get('subject_id')
+        day = request.form.get('day')
+        start_time = request.form.get('start_time')
+        end_time = request.form.get('end_time')
+        
+        # Validate input
+        if not all([class_id, section_id, subject_id, day, start_time, end_time]):
+            flash('All fields are required', 'error')
+        else:
+            try:
+                cursor.execute(
+                    """INSERT INTO schedules 
+                       (class_id, section_id, subject_id, day, start_time, end_time) 
+                       VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (class_id, section_id, subject_id, day, start_time, end_time)
+                )
+                conn.commit()
+                flash('Schedule added successfully', 'success')
+                return redirect(url_for('manage_schedules'))
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'error')
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('course_faculty/schedules.html', 
+                          schedules=schedules,
+                          classes=classes,
+                          sections=sections,
+                          subjects=subjects)
+
+@app.route('/course-faculty/resources', methods=['GET', 'POST'])
+def allocate_resources():
+    if not session.get('id'):
+        return redirect(url_for('login'))
+    
+    resources = []
+    allocations = []
+    
+    # Connect to database
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Get all resources
+    cursor.execute("SELECT * FROM resources ORDER BY name")
+    resources = cursor.fetchall()
+    
+    # Get subjects
+    cursor.execute("SELECT * FROM subjects ORDER BY name")
+    subjects = cursor.fetchall()
+    
+    # Get existing allocations
+    cursor.execute("""
+        SELECT a.id, r.name as resource_name, s.name as subject_name, 
+               a.quantity, a.allocation_date, a.return_date
+        FROM resource_allocations a
+        JOIN resources r ON a.resource_id = r.id
+        JOIN subjects s ON a.subject_id = s.id
+        ORDER BY a.allocation_date DESC
+    """)
+    allocations = cursor.fetchall()
+    
+    # Handle resource allocation submission
+    if request.method == 'POST':
+        resource_id = request.form.get('resource_id')
+        subject_id = request.form.get('subject_id')
+        quantity = request.form.get('quantity')
+        allocation_date = request.form.get('allocation_date')
+        return_date = request.form.get('return_date')
+        
+        # Validate input
+        if not all([resource_id, subject_id, quantity, allocation_date]):
+            flash('Required fields are missing', 'error')
+        else:
+            try:
+                cursor.execute(
+                    """INSERT INTO resource_allocations 
+                       (resource_id, subject_id, quantity, allocation_date, return_date) 
+                       VALUES (%s, %s, %s, %s, %s)""",
+                    (resource_id, subject_id, quantity, allocation_date, return_date)
+                )
+                conn.commit()
+                flash('Resource allocated successfully', 'success')
+                return redirect(url_for('allocate_resources'))
+            except Exception as e:
+                flash(f'Error: {str(e)}', 'error')
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('course_faculty/resources.html', 
+                          resources=resources,
+                          subjects=subjects,
+                          allocations=allocations)
+
 if __name__ == "__main__":
     app.run(debug=True)
 

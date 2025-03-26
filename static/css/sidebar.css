@@ -1,0 +1,20 @@
+/* Styles for Course & Faculty Management icon */
+.sidebar-item .fa-graduation-cap {
+  margin-right: 10px;
+  color: #3c8dbc;
+}
+
+/* Submenu icons */
+#courseSubmenu .fa-user-plus,
+#courseSubmenu .fa-calendar,
+#courseSubmenu .fa-cubes {
+  margin-right: 8px;
+  font-size: 0.9em;
+  color: #777;
+}
+
+/* Highlight effect for Course & Faculty section */
+.sidebar-item:hover .fa-graduation-cap,
+.sidebar-item.active .fa-graduation-cap {
+  color: #fff;
+}
