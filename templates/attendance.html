@@ -1,94 +1,273 @@
-{% include 'header.html' %}
-<body>
- {% include 'top_menus.html' %}
-  <div class="container">        
-      {% include 'left_menus.html' %}    
-	  <div class="content">
-		<div class="container-fluid">   	
-			<div class="row">
-				<div class="col-md-12">
-					<div class="box box-primary">
-						<div class="box-header with-border">
-							<h3 class="box-title"><i class="fa fa-search"></i> Select Criteria</h3>
-						</div>
-						<form id="form1" action="{{ url_for('getClassAttendance')}}" method="post" accept-charset="utf-8">
-							<div class="box-body">						
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="exampleInputEmail1">Class</label><small class="req"> *</small>
-											<select id="classid" name="classid" class="form-control" required>
-												<option value="">Select</option>
-												{% for class in classes %}								
-													<option value="{{class.id}}" {% if class.id == classId %} selected {% endif %}>{{class.name}}</option>				
-												{% endfor %}												
-											</select>
-											<span class="text-danger"></span>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="exampleInputEmail1">Section</label><small class="req"> *</small>
-												<select name="sectionid" id="sectionid" class="form-control" required>
-													<option value="">Select</option>
-													{% for section in sections %}
-														<option value="{{section.section_id}}" {% if section.section_id == sectionId %} selected {% endif %}>{{section.section}}</option>	
-													{% endfor %}
-												</select>
-											<span class="text-danger"></span>
-										</div>
-									</div> 									
-								</div>
-							</div>
-							<div class="box-footer">
-								<button type="submit" id="search" name="search" value="search" style="margin-bottom:10px;" class="btn btn-primary btn-sm  checkbox-toggle"><i class="fa fa-search"></i> Search</button> <br>
-							</div>
-						</form>
-					</div>					
-					<div class="row">					
-						<form id="attendanceForm" method="post">					
-							<div style="color:red;margin-top:20px;" class="" id="message"></div>
-							<button type="submit" id="saveAttendance" name="saveAttendance" value="Save Attendance" style="margin-bottom:10px;" class="btn btn-primary btn-sm  pull-right checkbox-toggle hidden"><i class="fa fa-save"></i> Save Attendance</button> <table id="studentList" class="table table-bordered table-striped">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Reg No</th>
-									<th>Roll No</th>	
-									<th>Name</th>
-									<th>Attendance</th>													
-								</tr>
-							</thead>
-							<tbody>
-							    {% for student in students %}
-								<tr>
-									<td>{{student.id}}</td>
-									<td>{{student.admission_no}}</td>
-									<td>{{student.roll_no}}</td>	
-									<td>{{student.name}}</td>
-									<td>
-									
-									<input type="radio" id="attendencetype1_"+{{student.id}}+" value="1" name="attendencetype_"+{{student.id}}+" autocomplete="off" '.$checked['1'].'>
-									<label for="attendencetype_"+{{student.id}}+">Present</label>
-									<input type="radio" id="attendencetype2_"+{{student.id}}+"" value="2" name="attendencetype_"+{{student.id}}+"" autocomplete="off" '.$checked['2'].'>
-									<label for="attendencetype"+{{student.id}}+">Late </label>
-									<input type="radio" id="attendencetype3_"+{{student.id}}+" value="3" name="attendencetype_"+{{student.id}}+" autocomplete="off" '.$checked['3'].'>
-									<label for="attendencetype3_"+{{student.id}}+"> Absent </label>
-									<input type="radio" id="attendencetype4_"+{{student.id}}+" value="4" name="attendencetype_"+{{student.id}}+" autocomplete="off" '.$checked['4'].'><label for="attendencetype_"+{{student.id}}+"> Half Day </label>
-									
-									</td>													
-								</tr>
-								{% endfor %}
-							</tbody>
-							</table>
-							<input type="hidden" name="action" id="action" value="updateAttendance" />
-							<input type="hidden" name="att_classid" id="att_classid" value="" />
-							<input type="hidden" name="att_sectionid" id="att_sectionid" value="" />
-						</form>
-					</div>							
+{% extends 'layout.html' %}
+{% block title %}Attendance - School Management System{% endblock %}
+{% block header %}Attendance Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Attendance</li>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+	<a href="{{ url_for('report') }}" class="btn btn-primary">
+		<i class="fas fa-chart-bar me-1"></i> View Reports
+	</a>
+</div>
+
+<!-- Stats Cards -->
+<div class="row fade-in">
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card card-stat border-left-primary shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+							Total Students</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800" id="totalStudents">--</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-users fa-2x text-gray-300"></i>
+					</div>
 				</div>
 			</div>
-		</div>	
+		</div>
 	</div>
-  </div>
-  </body>
-</html>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card card-stat border-left-success shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+							Present Today</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800" id="presentCount">--</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-check-circle fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card card-stat border-left-danger shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+							Absent Today</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800" id="absentCount">--</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-times-circle fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card card-stat border-left-info shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+							Attendance Rate</div>
+						<div class="row no-gutters align-items-center">
+							<div class="col-auto">
+								<div class="h5 mb-0 me-3 font-weight-bold text-gray-800" id="attendanceRate">--</div>
+							</div>
+							<div class="col">
+								<div class="progress progress-sm mr-2">
+									<div id="attendanceProgress" class="progress-bar bg-info" role="progressbar"
+										style="width: 0%"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-percent fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Main Content -->
+<div class="row">
+	<!-- Class Selection -->
+	<div class="col-12 mb-4">
+		<div class="card shadow">
+			<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+				<h6 class="m-0 font-weight-bold text-primary">
+					<i class="fas fa-search me-1"></i> Select Class
+				</h6>
+			</div>
+			<div class="card-body">
+				<form method="post" id="attendanceForm" action="{{ url_for('getClassAttendance') }}">
+					<div class="row g-3">
+						<div class="col-md-5">
+							<label for="classid" class="form-label">Class</label>
+							<select class="form-select" name="classid" id="classid" required>
+								<option value="">Select Class</option>
+								{% for class in classes %}
+								<option value="{{ class.id }}" {% if classId and classId|string==class.id|string
+									%}selected{% endif %}>
+									{{ class.name }}
+								</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="col-md-5">
+							<label for="sectionid" class="form-label">Section</label>
+							<select class="form-select" name="sectionid" id="sectionid" required>
+								<option value="">Select Section</option>
+								{% for section in sections %}
+								<option value="{{ section.section_id }}" {% if sectionId and
+									sectionId|string==section.section_id|string %}selected{% endif %}>
+									{{ section.section }}
+								</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="col-md-2 d-flex align-items-end">
+							<button type="submit" class="btn btn-primary w-100">
+								<i class="fas fa-search me-1"></i> Get Students
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Student List -->
+	{% if students %}
+	<div class="col-12">
+		<div class="card shadow mb-4">
+			<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+				<h6 class="m-0 font-weight-bold text-primary">
+					<i class="fas fa-user-check me-1"></i> Mark Attendance
+				</h6>
+				<div>
+					<button type="button" class="btn btn-success btn-sm me-2" id="markAllPresent">
+						<i class="fas fa-check-circle me-1"></i> Mark All Present
+					</button>
+					<button type="button" class="btn btn-danger btn-sm" id="markAllAbsent">
+						<i class="fas fa-times-circle me-1"></i> Mark All Absent
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead class="bg-light">
+							<tr>
+								<th>Roll No</th>
+								<th>Student Name</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for student in students %}
+							<tr>
+								<td>{{ student.roll_no }}</td>
+								<td>
+									<div class="d-flex align-items-center">
+										{% if student.photo %}
+										<img src="{{ url_for('static', filename=student.photo) }}"
+											class="rounded-circle me-2" width="32" height="32">
+										{% else %}
+										<div class="bg-light rounded-circle me-2 d-flex align-items-center justify-content-center"
+											style="width: 32px; height: 32px;">
+											<i class="fas fa-user text-gray-500"></i>
+										</div>
+										{% endif %}
+										{{ student.name }}
+									</div>
+								</td>
+								<td>
+									<div class="btn-group" role="group">
+										<input type="radio" class="btn-check" name="attendance_{{ student.id }}"
+											id="present_{{ student.id }}" value="present" {% if
+											student.attendance_status=='present' %}checked{% endif %}>
+										<label class="btn btn-outline-success btn-sm"
+											for="present_{{ student.id }}">Present</label>
+
+										<input type="radio" class="btn-check" name="attendance_{{ student.id }}"
+											id="absent_{{ student.id }}" value="absent" {% if
+											student.attendance_status=='absent' %}checked{% endif %}>
+										<label class="btn btn-outline-danger btn-sm"
+											for="absent_{{ student.id }}">Absent</label>
+									</div>
+								</td>
+								<td>
+									<a href="{{ url_for('view_student', student_id=student.id) }}"
+										class="btn btn-info btn-sm">
+										<i class="fas fa-eye me-1"></i> View Details
+									</a>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="text-end mt-3">
+					<button type="button" class="btn btn-primary" id="saveAttendance">
+						<i class="fas fa-save me-1"></i> Save Attendance
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	$(document).ready(function () {
+		// Initialize attendance stats
+		function updateAttendanceStats() {
+			const total = $('.table tbody tr').length;
+			const present = $('input[value="present"]:checked').length;
+			const absent = $('input[value="absent"]:checked').length;
+			const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+
+			$('#totalStudents').text(total);
+			$('#presentCount').text(present);
+			$('#absentCount').text(absent);
+			$('#attendanceRate').text(rate + '%');
+			$('#attendanceProgress').css('width', rate + '%');
+		}
+
+		// Mark all present/absent
+		$('#markAllPresent').click(function () {
+			$('input[value="present"]').prop('checked', true);
+			updateAttendanceStats();
+		});
+
+		$('#markAllAbsent').click(function () {
+			$('input[value="absent"]').prop('checked', true);
+			updateAttendanceStats();
+		});
+
+		// Update stats when attendance is changed
+		$('input[name^="attendance_"]').change(function () {
+			updateAttendanceStats();
+		});
+
+		// Initial stats update
+		updateAttendanceStats();
+
+		// Save attendance
+		$('#saveAttendance').click(function () {
+			// Add your save attendance logic here
+			alert('Attendance saved successfully!');
+		});
+	});
+</script>
+{% endblock %}

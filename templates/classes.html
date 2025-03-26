@@ -1,426 +1,321 @@
-{% include 'header.html' %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<style>
-/* Force override any cached styles */
-.dashboard-card {
-  border: 1px solid #e3e6f0 !important;
-  border-radius: 0.35rem !important;
-  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
-  margin-bottom: 20px !important;
-  transition: all 0.3s ease !important;
-}
-.dashboard-card:hover {
-  transform: translateY(-5px) !important;
-  box-shadow: 0 0.5rem 1rem 0 rgba(58, 59, 69, 0.2) !important;
-}
-.card-header-custom {
-  padding: 0.75rem 1.25rem !important;
-  margin-bottom: 0 !important;
-  background-color: #f8f9fc !important;
-  border-bottom: 1px solid #e3e6f0 !important;
-}
-.card-title-custom {
-  margin-bottom: 0 !important;
-  font-weight: bold !important;
-  color: #4e73df !important;
-}
-.action-icon {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 50% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 auto 15px auto !important;
-}
-.primary-icon {
-  background-color: rgba(78, 115, 223, 0.1) !important;
-  color: #4e73df !important;
-}
-.success-icon {
-  background-color: rgba(28, 200, 138, 0.1) !important;
-  color: #1cc88a !important;
-}
-.warning-icon {
-  background-color: rgba(246, 194, 62, 0.1) !important;
-  color: #f6c23e !important;
-}
-.info-icon {
-  background-color: rgba(54, 185, 204, 0.1) !important;
-  color: #36b9cc !important;
-}
-.stat-card {
-  border-left: 4px solid transparent !important;
-  padding: 0.75rem !important;
-}
-.primary-card {
-  border-left-color: #4e73df !important;
-}
-.success-card {
-  border-left-color: #1cc88a !important;
-}
-.info-card {
-  border-left-color: #36b9cc !important;
-}
-.text-primary-custom {
-  color: #4e73df !important;
-}
-.text-success-custom {
-  color: #1cc88a !important;
-}
-.text-info-custom {
-  color: #36b9cc !important;
-}
-.stat-title {
-  font-size: 0.7rem !important;
-  font-weight: bold !important;
-  text-transform: uppercase !important;
-  margin-bottom: 0.25rem !important;
-}
-.stat-value {
-  font-size: 1.25rem !important;
-  font-weight: bold !important;
-  color: #5a5c69 !important;
-}
-.code-badge {
-  background-color: #36b9cc !important;
-  color: white !important;
-  padding: 3px 8px !important;
-  border-radius: 0.25rem !important;
-  font-size: 12px !important;
-}
-.table-custom {
-  margin-bottom: 20px !important;
-}
-.table-custom th {
-  background-color: #f8f9fc !important;
-  color: #4e73df !important;
-  font-weight: bold !important;
-}
-/* Adding dashboard styles */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  border-bottom: 1px solid #e3e6f0;
-  padding-bottom: 15px;
-}
-.page-header h1 {
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: #5a5c69;
-  margin: 0;
-}
-.modal-header {
-  background-color: #4e73df;
-  color: white;
-  border-radius: 0.35rem 0.35rem 0 0;
-}
-.modal-title {
-  color: white;
-}
-.close {
-  color: white;
-  opacity: 1;
-}
-.btn-add {
-  background-color: #4e73df;
-  color: white;
-  border-radius: 0.35rem;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  border: none;
-}
-.btn-add:hover {
-  background-color: #2e59d9;
-  color: white;
-}
-.card-box {
-  padding: 20px;
-  border-radius: 0.35rem;
-  margin-bottom: 30px;
-  background-color: #fff;
-  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-}
-</style>
-<body>
- {% include 'top_menus.html' %}
-  <div class="container">        
-      {% include 'left_menus.html' %}    
-      <div class="content">
-        <div class="container-fluid">
-            <!-- Page Header -->
-            <div class="page-header">
-                <h1><i class="fas fa-school"></i> Classes Management</h1>
-                <button type="button" name="add" id="addClass" class="btn btn-add">
-                    <i class="fas fa-plus"></i> Add New Class
-                </button>
-            </div>
-        
-            <!-- Class Statistics -->
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="dashboard-card stat-card primary-card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="stat-title text-primary-custom">Total Classes</div>
-                                    <div class="stat-value">{{ classes|length }}</div>
-                                </div>
-                                <div class="col-md-4 text-right">
-                                    <i class="fas fa-school fa-2x" style="color: #dddfeb;"></i>
-                                </div>
-                            </div>
-                        </div>
+{% extends 'layout.html' %}
+{% block title %}Classes - School Management System{% endblock %}
+{% block header %}Classes Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Classes</li>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <!-- <h1 class="h3 mb-0 text-gray-800">
+        <i class="fas fa-school me-2"></i>Classes Management
+    </h1> -->
+    <button type="button" name="add" id="addClass" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> Add New Class
+    </button>
+</div>
+
+<!-- Stats Cards -->
+<div class="row fade-in">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-stat border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Classes</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ classes|length }}</div>
                     </div>
-                </div>
-                
-                <div class="col-lg-4">
-                    <div class="dashboard-card stat-card success-card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="stat-title text-success-custom">Students Enrolled</div>
-                                    <div class="stat-value" id="studentEnrolled">--</div>
-                                </div>
-                                <div class="col-md-4 text-right">
-                                    <i class="fas fa-user-graduate fa-2x" style="color: #dddfeb;"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4">
-                    <div class="dashboard-card stat-card info-card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="stat-title text-info-custom">Class Sections</div>
-                                    <div class="stat-value" id="classSections">--</div>
-                                </div>
-                                <div class="col-md-4 text-right">
-                                    <i class="fas fa-layer-group fa-2x" style="color: #dddfeb;"></i>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-auto">
+                        <i class="fas fa-school fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
-                
-            <!-- Classes Table Card -->
-            <div class="card-box">
-                <div class="card-header-custom">
-                    <h6 class="card-title-custom">
-                        <i class="fas fa-list"></i> Class List
-                    </h6>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-stat border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Students Enrolled</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="studentEnrolled">--</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <!-- Enhanced Table -->
-                    <div class="table-responsive">
-                        <table id="classList" class="table table-bordered table-striped table-custom">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>                        
-                                    <th>Class Code</th>
-                                    <th>Edit</th>
-                                    <th>Delete</th>                            
-                                </tr>
-                            </thead>
-                            <tbody>
-                              {% for class in classes %}
-                              <tr>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-stat border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Class Sections</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="classSections">--</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-layer-group fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Classes Table -->
+    <div class="col-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-list me-1"></i> Class List
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="classList" class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Class Code</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for class in classes %}
+                            <tr>
                                 <td>{{class.class_id}}</td>
                                 <td>{{class.name}}</td>
-                                <td><span class="code-badge">{{class.code}}</span></td>                        
-                                <td><a href="{{url_for('edit_classes', class_id=class.class_id)}}" class="btn btn-primary update" id="{{class.class_id}}">Edit</a></td>
-                                <td><a href="{{url_for('delete_classes', class_id=class.class_id)}}" class="btn btn-danger">Delete</a></td>
-                              </tr> 
-                            {% endfor %}      
-                            </tbody>
-                        </table>
-                    </div>
+                                <td><span class="badge bg-info">{{class.code}}</span></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary update"
+                                        data-id="{{class.class_id}}">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
+                                    <a href="{{url_for('delete_classes', class_id=class.class_id)}}"
+                                        class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-                
-            <!-- Quick Links -->
-            <div class="card-box">
-                <div class="card-header-custom">
-                    <h6 class="card-title-custom">
-                        <i class="fas fa-tasks"></i> Class Management
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <div class="dashboard-card" id="quickAddClass">
-                                <div class="card-body text-center">
-                                    <div class="action-icon primary-icon">
-                                        <i class="fas fa-plus"></i>
-                                    </div>
-                                    <h6 class="mb-0">Add New Class</h6>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tasks me-1"></i> Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="card action-card h-100" id="quickAddClass" style="cursor: pointer;">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-plus"></i>
                                 </div>
+                                <h6 class="card-title mb-0">Add New Class</h6>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('sections') }}" style="text-decoration: none;">
-                                <div class="dashboard-card">
-                                    <div class="card-body text-center">
-                                        <div class="action-icon success-icon">
-                                            <i class="fas fa-layer-group"></i>
-                                        </div>
-                                        <h6 class="mb-0">Manage Sections</h6>
-                                    </div>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('sections') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-success-light text-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-layer-group"></i>
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('student') }}" style="text-decoration: none;">
-                                <div class="dashboard-card">
-                                    <div class="card-body text-center">
-                                        <div class="action-icon warning-icon">
-                                            <i class="fas fa-user-graduate"></i>
-                                        </div>
-                                        <h6 class="mb-0">Manage Students</h6>
-                                    </div>
+                                <h6 class="card-title mb-0">Manage Sections</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('student') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-warning-light text-warning rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user-graduate"></i>
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ url_for('subject') }}" style="text-decoration: none;">
-                                <div class="dashboard-card">
-                                    <div class="card-body text-center">
-                                        <div class="action-icon info-icon">
-                                            <i class="fas fa-book"></i>
-                                        </div>
-                                        <h6 class="mb-0">Manage Subjects</h6>
-                                    </div>
+                                <h6 class="card-title mb-0">Manage Students</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('subject') }}" class="card action-card h-100 text-decoration-none">
+                            <div class="card-body text-center">
+                                <div class="action-icon bg-info-light text-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-book"></i>
                                 </div>
-                            </a>
-                        </div>
+                                <h6 class="card-title mb-0">Manage Subjects</h6>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
     </div>
-  </div>
-  
-  <!-- Class Modal -->
-  <div id="classModal" class="modal fade">
+</div>
+
+<!-- Class Modal -->
+<div class="modal fade" id="classModal" tabindex="-1" aria-labelledby="classModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form method="post" id="classForm" action="{{ url_for('save_classes')}}">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> <span id="modalTitle">Edit Class</span></h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="classModalLabel"><i class="fa fa-plus me-2"></i><span
+                            id="modalTitle">Edit Class</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="name" class="control-label">Class Name*</label>
-                        <input type="text" class="form-control" id="className" name="className" placeholder="Class Name" required>            
+                    <div class="mb-3">
+                        <label for="className" class="form-label">Class Name*</label>
+                        <input type="text" class="form-control" id="className" name="className"
+                            placeholder="Enter class name" required>
                     </div>
-                    <div class="form-group">
-                        <label for="code" class="control-label">Class Code*</label>
-                        <input type="text" class="form-control" id="classCode" name="classCode" placeholder="Class Code..." required>        
-                    </div>                        
+                    <div class="mb-3">
+                        <label for="classCode" class="form-label">Class Code*</label>
+                        <input type="text" class="form-control" id="classCode" name="classCode"
+                            placeholder="Enter class code" required>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" name="classid" id="classid" />
                     <input type="hidden" name="action" id="action" value="" />
-                    <input type="submit" name="save" id="save" class="btn btn-primary" value="Save" />
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="save">Save</button>
                 </div>
             </div>
         </form>
     </div>
- </div>
+</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-// Force this script to run after page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Add Class Button Click
-    document.getElementById('addClass').addEventListener('click', function() {
-        document.getElementById('modalTitle').textContent = 'Add Class';
-        document.getElementById('classForm').reset();
-        document.getElementById('classid').value = '';
-        document.getElementById('action').value = 'addClass';
-        $('#classModal').modal('show');
-    });
-    
-    // Quick Add Class Button Click
-    document.getElementById('quickAddClass').addEventListener('click', function() {
-        document.getElementById('modalTitle').textContent = 'Add Class';
-        document.getElementById('classForm').reset();
-        document.getElementById('classid').value = '';
-        document.getElementById('action').value = 'addClass';
-        $('#classModal').modal('show');
-    });
-    
-    // Edit class button functionality
-    var updateButtons = document.querySelectorAll('.update');
-    updateButtons.forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            var class_id = this.getAttribute('id');
-            document.getElementById('modalTitle').textContent = 'Edit Class';
-            
-            // AJAX request
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/get_class/' + class_id, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
-                    document.getElementById('className').value = data.name;
-                    document.getElementById('classCode').value = data.code;
-                    document.getElementById('classid').value = data.class_id;
-                    document.getElementById('action').value = 'updateClass';
-                    $('#classModal').modal('show');
-                }
-            };
-            xhr.send();
-        });
-    });
-    
-    // Display example counts
-    setTimeout(function() {
-        document.getElementById('studentEnrolled').textContent = '125';
-        document.getElementById('classSections').textContent = '15';
-    }, 500);
-    
-    // Add jQuery fallback for buttons in case addEventListener fails
-    $(document).ready(function() {
-        $("#addClass, #quickAddClass").on('click', function() {
+    $(document).ready(function () {
+        // Make sure Bootstrap is available
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded');
+            return;
+        }
+
+        // Initialize modal
+        const classModal = new bootstrap.Modal(document.getElementById('classModal'));
+
+        // Debug log
+        console.log('Modal initialized:', classModal);
+
+        // Add Class Button Click
+        $('#addClass, #quickAddClass').on('click', function () {
+            console.log('Add class button clicked');
             $('#modalTitle').text('Add Class');
             $('#classForm')[0].reset();
             $('#classid').val('');
             $('#action').val('addClass');
-            $('#classModal').modal('show');
+            classModal.show();
         });
-        
-        $(document).on('click', '.update', function(e){
+
+        // Edit class button functionality
+        $(document).on('click', '.update', function (e) {  // Changed to event delegation
             e.preventDefault();
-            var class_id = $(this).attr("id");
+            console.log('Edit button clicked');
+
+            const class_id = $(this).data('id');
+            console.log('Class ID:', class_id);
+
             $('#modalTitle').text('Edit Class');
+
             $.ajax({
-                url: "/get_class/" + class_id,
-                method: "GET",
-                dataType: "json",
-                success: function(data) {
+                url: '/get_class/' + class_id,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    console.log('Received data:', data);
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
                     $('#className').val(data.name);
                     $('#classCode').val(data.code);
                     $('#classid').val(data.class_id);
                     $('#action').val('updateClass');
-                    $('#classModal').modal('show');
+                    classModal.show();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Ajax error:', error);
+                    console.log('Response:', xhr.responseText);
+                    alert('Error fetching class data. Please try again.');
                 }
             });
         });
-    });
-});
-</script>
 
-</body>
-</html>
+        // Form submission handling
+        $('#classForm').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function (response) {
+                    if (response.error) {
+                        alert('Error: ' + response.error);
+                        return;
+                    }
+                    classModal.hide();
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Form submission error:', error);
+                    alert('Error saving class data. Please try again.');
+                }
+            });
+        });
+
+        // Display example counts with animation
+        function animateCounter(elementId, finalValue, duration = 1000) {
+            let startValue = 0;
+            const increment = finalValue / (duration / 50);
+
+            const timer = setInterval(() => {
+                startValue += increment;
+                if (startValue >= finalValue) {
+                    clearInterval(timer);
+                    startValue = finalValue;
+                }
+                $(`#${elementId}`).text(Math.floor(startValue));
+            }, 50);
+        }
+
+        // Initialize counters
+        setTimeout(function () {
+            animateCounter('studentEnrolled', 125);
+            animateCounter('classSections', 15);
+        }, 500);
+    });
+</script>
+{% endblock %}

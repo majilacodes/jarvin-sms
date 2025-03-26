@@ -52,6 +52,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS sms_classes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
+            code TEXT,
             section INTEGER,
             teacher_id INTEGER
         );
@@ -81,7 +82,68 @@ def init_db():
             attendance_status TEXT,
             attendance_date DATE
         );
+
+        -- Exam Types (e.g., Midterm, Final, Quiz)
+        CREATE TABLE IF NOT EXISTS sms_exam_types (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT
+        );
+
+        -- Exams
+        CREATE TABLE IF NOT EXISTS sms_exams (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            exam_type_id INTEGER,
+            class_id INTEGER,
+            subject_id INTEGER,
+            exam_date DATE,
+            total_marks INTEGER,
+            passing_marks INTEGER,
+            academic_year TEXT,
+            status TEXT DEFAULT 'upcoming',
+            FOREIGN KEY (exam_type_id) REFERENCES sms_exam_types(id),
+            FOREIGN KEY (class_id) REFERENCES sms_classes(id),
+            FOREIGN KEY (subject_id) REFERENCES sms_subjects(subject_id)
+        );
+
+        -- Student Exam Results
+        CREATE TABLE IF NOT EXISTS sms_exam_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            exam_id INTEGER,
+            student_id INTEGER,
+            marks_obtained DECIMAL(5,2),
+            grade TEXT,
+            remarks TEXT,
+            date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (exam_id) REFERENCES sms_exams(id),
+            FOREIGN KEY (student_id) REFERENCES sms_students(id)
+        );
     ''')
+    
+    # Check if code column exists
+    cursor.execute("PRAGMA table_info(sms_classes)")
+    columns = cursor.fetchall()
+    code_exists = any(column[1] == 'code' for column in columns)
+    
+    # Add code column if it doesn't exist
+    if not code_exists:
+        try:
+            cursor.execute('ALTER TABLE sms_classes ADD COLUMN code TEXT')
+            db.commit()
+        except:
+            pass  # Column might already exist
+    
+    # Insert default exam types if they don't exist
+    cursor.execute('SELECT COUNT(*) FROM sms_exam_types')
+    if cursor.fetchone()[0] == 0:
+        cursor.executescript('''
+            INSERT INTO sms_exam_types (name, description) VALUES 
+            ('Midterm', 'Mid-semester examination'),
+            ('Final', 'End of semester examination'),
+            ('Quiz', 'Short assessment test'),
+            ('Assignment', 'Homework/Project assessment');
+        ''')
+    
     db.commit()
     db.close()
 
@@ -269,22 +331,15 @@ def delete_subject():
 
 ################################ Classes  #######################################
 
-@app.route("/classes", methods =['GET', 'POST'])
+@app.route("/classes", methods=['GET', 'POST'])
 def classes():
-    if 'loggedin' in session:  
+    if 'loggedin' in session:
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT c.id, c.name, s.section, t.teacher FROM sms_classes c LEFT JOIN sms_section s ON s.section_id = c.section LEFT JOIN sms_teacher t ON t.teacher_id = c.teacher_id')
-        classes = cursor.fetchall() 
-           
-        cursor.execute('SELECT * FROM sms_section')
-        sections = cursor.fetchall() 
-        
-        cursor.execute('SELECT * FROM sms_teacher')
-        teachers = cursor.fetchall()
-        
+        cursor.execute('SELECT id as class_id, name, COALESCE(code, "") as code FROM sms_classes')
+        classes = cursor.fetchall()
         db.close()
-        return render_template("class.html", classes = classes, sections = sections, teachers = teachers)
+        return render_template("classes.html", classes=classes)
     return redirect(url_for('login'))
 
 @app.route("/edit_class", methods =['GET'])
@@ -890,6 +945,203 @@ def allocate_resources():
                           subjects=subjects,
                           allocations=allocations)
 
+@app.route("/get_class/<int:class_id>", methods=['GET'])
+def get_class(class_id):
+    if 'loggedin' in session:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT id, name, COALESCE(code, "") as code FROM sms_classes WHERE id = ?', (class_id,))
+        class_data = cursor.fetchone()
+        db.close()
+        
+        if class_data:
+            return jsonify({
+                'class_id': class_data['id'],
+                'name': class_data['name'],
+                'code': class_data['code']
+            })
+    return jsonify({'error': 'Class not found'}), 404
+
+@app.route("/save_classes", methods=['POST'])
+def save_classes():
+    if 'loggedin' in session:
+        if request.method == 'POST':
+            class_name = request.form.get('className')
+            class_code = request.form.get('classCode')
+            action = request.form.get('action')
+            
+            db = get_db()
+            cursor = db.cursor()
+            
+            try:
+                if action == 'updateClass':
+                    class_id = request.form.get('classid')
+                    cursor.execute('UPDATE sms_classes SET name = ?, code = ? WHERE id = ?',
+                                 (class_name, class_code, class_id))
+                else:
+                    cursor.execute('INSERT INTO sms_classes (name, code) VALUES (?, ?)',
+                                 (class_name, class_code))
+                
+                db.commit()
+                return jsonify({'success': True})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+            finally:
+                db.close()
+    return jsonify({'error': 'Unauthorized'}), 401
+
+# Add these routes
+@app.route("/examination", methods=['GET'])
+def examination():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+        
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Get upcoming exams
+    cursor.execute('''
+        SELECT e.*, et.name as exam_type, c.name as class_name, s.subject as subject_name
+        FROM sms_exams e
+        JOIN sms_exam_types et ON e.exam_type_id = et.id
+        JOIN sms_classes c ON e.class_id = c.id
+        JOIN sms_subjects s ON e.subject_id = s.subject_id
+        WHERE e.exam_date >= date('now')
+        ORDER BY e.exam_date ASC
+        LIMIT 5
+    ''')
+    upcoming_exams = cursor.fetchall()
+    
+    # Get recent results
+    cursor.execute('''
+        SELECT er.*, e.exam_date, et.name as exam_type, 
+               s.name as student_name, c.name as class_name, 
+               sub.subject as subject_name
+        FROM sms_exam_results er
+        JOIN sms_exams e ON er.exam_id = e.id
+        JOIN sms_exam_types et ON e.exam_type_id = et.id
+        JOIN sms_students s ON er.student_id = s.id
+        JOIN sms_classes c ON e.class_id = c.id
+        JOIN sms_subjects sub ON e.subject_id = sub.subject_id
+        ORDER BY er.date_added DESC
+        LIMIT 5
+    ''')
+    recent_results = cursor.fetchall()
+    
+    # Get summary stats
+    cursor.execute('SELECT COUNT(*) FROM sms_exams')
+    total_exams = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM sms_exam_results')
+    total_results = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT AVG(marks_obtained) FROM sms_exam_results')
+    avg_score = cursor.fetchone()[0] or 0
+    
+    # Get classes and subjects for the form
+    cursor.execute('SELECT * FROM sms_classes')
+    classes = cursor.fetchall()
+    
+    cursor.execute('SELECT * FROM sms_subjects')
+    subjects = cursor.fetchall()
+    
+    cursor.execute('SELECT * FROM sms_exam_types')
+    exam_types = cursor.fetchall()
+    
+    db.close()
+    
+    return render_template('examination.html',
+                         upcoming_exams=upcoming_exams,
+                         recent_results=recent_results,
+                         total_exams=total_exams,
+                         total_results=total_results,
+                         avg_score=round(avg_score, 2),
+                         classes=classes,
+                         subjects=subjects,
+                         exam_types=exam_types)
+
+@app.route("/add_exam", methods=['POST'])
+def add_exam():
+    if 'loggedin' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    exam_type = request.form.get('exam_type')
+    class_id = request.form.get('class_id')
+    subject_id = request.form.get('subject_id')
+    exam_date = request.form.get('exam_date')
+    total_marks = request.form.get('total_marks')
+    passing_marks = request.form.get('passing_marks')
+    
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute('''
+            INSERT INTO sms_exams 
+            (exam_type_id, class_id, subject_id, exam_date, total_marks, passing_marks, academic_year)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (exam_type, class_id, subject_id, exam_date, total_marks, passing_marks, '2023-24'))
+        db.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@app.route("/grade_exam/<int:exam_id>", methods=['GET', 'POST'])
+def grade_exam(exam_id):
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+        
+    db = get_db()
+    cursor = db.cursor()
+    
+    if request.method == 'POST':
+        for key, value in request.form.items():
+            if key.startswith('grade_'):
+                student_id = key.split('_')[1]
+                marks = value
+                grade = calculate_grade(float(marks))  # You'll need to implement this function
+                
+                cursor.execute('''
+                    INSERT INTO sms_exam_results 
+                    (exam_id, student_id, marks_obtained, grade)
+                    VALUES (?, ?, ?, ?)
+                ''', (exam_id, student_id, marks, grade))
+        
+        db.commit()
+        return redirect(url_for('examination'))
+    
+    # Get exam details
+    cursor.execute('''
+        SELECT e.*, et.name as exam_type, c.name as class_name, s.subject as subject_name
+        FROM sms_exams e
+        JOIN sms_exam_types et ON e.exam_type_id = et.id
+        JOIN sms_classes c ON e.class_id = c.id
+        JOIN sms_subjects s ON e.subject_id = s.subject_id
+        WHERE e.id = ?
+    ''', (exam_id,))
+    exam = cursor.fetchone()
+    
+    # Get students in this class
+    cursor.execute('''
+        SELECT s.*, COALESCE(er.marks_obtained, -1) as marks, er.grade
+        FROM sms_students s
+        LEFT JOIN sms_exam_results er ON er.student_id = s.id AND er.exam_id = ?
+        WHERE s.class = ?
+    ''', (exam_id, exam['class_id']))
+    students = cursor.fetchall()
+    
+    db.close()
+    
+    return render_template('grade_exam.html', exam=exam, students=students)
+
+# Temporary code to reinitialize database
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Delete existing database if it exists
+    if os.path.exists('python_sms.db'):
+        os.remove('python_sms.db')
+    # Initialize fresh database
+    init_db()
+    app.run(port=5006, debug=True)
 

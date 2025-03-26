@@ -1,0 +1,245 @@
+{% extends 'layout.html' %}
+{% block title %}Examination - School Management System{% endblock %}
+{% block header %}Examination Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Examination</li>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExamModal">
+        <i class="fas fa-plus me-1"></i> Schedule New Exam
+    </button>
+</div>
+
+<!-- Stats Cards -->
+<div class="row fade-in">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-stat border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Exams</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_exams }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-stat border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Results Published</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_results }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-stat border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Average Score</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ avg_score }}%</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upcoming Exams -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-calendar me-1"></i> Upcoming Exams
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Exam</th>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in upcoming_exams %}
+                            <tr>
+                                <td>{{ exam.exam_date }}</td>
+                                <td>{{ exam.exam_type }}</td>
+                                <td>{{ exam.class_name }}</td>
+                                <td>{{ exam.subject_name }}</td>
+                                <td>
+                                    <a href="{{ url_for('grade_exam', exam_id=exam.id) }}"
+                                        class="btn btn-primary btn-sm">
+                                        <i class="fas fa-pen me-1"></i> Grade
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Results -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-bar me-1"></i> Recent Results
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Student</th>
+                                <th>Exam</th>
+                                <th>Grade</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in recent_results %}
+                            <tr>
+                                <td>{{ result.student_name }}</td>
+                                <td>{{ result.exam_type }} - {{ result.subject_name }}</td>
+                                <td>
+                                    <span
+                                        class="badge bg-{{ 'success' if result.grade in ['A', 'B'] else 'warning' if result.grade == 'C' else 'danger' }}">
+                                        {{ result.grade }}
+                                    </span>
+                                </td>
+                                <td>{{ result.date_added }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Exam Modal -->
+<div class="modal fade" id="addExamModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Schedule New Exam
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addExamForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Exam Type</label>
+                        <select class="form-select" name="exam_type" required>
+                            {% for type in exam_types %}
+                            <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Class</label>
+                        <select class="form-select" name="class_id" required>
+                            {% for class in classes %}
+                            <option value="{{ class.id }}">{{ class.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select" name="subject_id" required>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.subject_id }}">{{ subject.subject }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Exam Date</label>
+                        <input type="date" class="form-control" name="exam_date" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Total Marks</label>
+                                <input type="number" class="form-control" name="total_marks" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Passing Marks</label>
+                                <input type="number" class="form-control" name="passing_marks" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Schedule Exam</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        // Handle form submission
+        $('#addExamForm').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '{{ url_for("add_exam") }}',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.error);
+                    }
+                },
+                error: function () {
+                    alert('Error scheduling exam');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
