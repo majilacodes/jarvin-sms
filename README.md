@@ -1,11 +1,33 @@
-# 🎓 Intelligent Campus Management System
-![Image](https://github.com/user-attachments/assets/b7b0a39d-6958-40b5-8acc-7de9aad820bd)
-![alt text](https://drive.google.com/uc?id=<1N2QEhi1L0oR_i83TRNTQEj3fgxSST4iR>)
-![alt text](https://drive.google.com/uc?id=<1kENVFydsVH8WqdjODzxEBXWcvgSQV-vw>)
-![alt text](https://drive.google.com/uc?id=<1dyUp-_c3hLO72RCRHEJ7DIxO3zYadXq7>)
-![alt text](https://drive.google.com/uc?id=<1AOaTr9Mlvyl5qxjDkvVGR9HiK7b4jhsj>)
-![alt text](https://drive.google.com/uc?id=<1x2URWwpzIiMepqXmXBPRKmrAoXzRIApZ>)
-![alt text](https://drive.google.com/uc?id=<1GQFxsF9uo-AvoD-OApJtar8nxv5iRVt6>)
+ 🎓 Intelligent Campus Management System
+
+ Admin Panel - 
+ 
+ ![Screenshot 2025-03-27 104423](https://github.com/user-attachments/assets/c73479b4-bdd4-4a68-9472-bc156626856b)
+ ![Screenshot 2025-03-27 124524](https://github.com/user-attachments/assets/523e8b65-7bec-4c03-a4a1-783f682d8403)
+ ![Screenshot 2025-03-27 104502](https://github.com/user-attachments/assets/83c05c6d-3a19-4a28-90d4-6a73da3ceb86)
+![Screenshot 2025-03-27 124609](https://github.com/user-attachments/assets/5c2e3fbd-acf8-4974-a916-951cacc8d9d3)
+![Screenshot 2025-03-27 124556](https://github.com/user-attachments/assets/193156c0-77db-465e-a1bb-85930152fd01)
+![Screenshot 2025-03-27 124548](https://github.com/user-attachments/assets/c28a3fd1-69b7-44c7-b59b-dcb35e6656cf)
+![Screenshot 2025-03-27 124539](https://github.com/user-attachments/assets/fb7592cf-3349-48f9-a73d-f9f296ec5521)
+![Screenshot 2025-03-27 124531](https://github.com/user-attachments/assets/db6cac32-cb29-49c9-bb4b-1966a5712777)
+![Screenshot 2025-03-27 124440](https://github.com/user-attachments/assets/6179dae0-daf7-4af6-a1c0-329e7a8f655c)
+![Screenshot 2025-03-27 124515](https://github.com/user-attachments/assets/8a514572-0b59-4f5d-9daa-3d9935a906ae)
+![Screenshot 2025-03-27 124501](https://github.com/user-attachments/assets/740f26a8-f475-42dd-bda8-1b3e35516549)
+![Screenshot 2025-03-27 124451](https://github.com/user-attachments/assets/3962e9a9-7f1c-45a3-993e-e6e282111371)
+![Screenshot 2025-03-27 105329](https://github.com/user-attachments/assets/d9406b14-c08e-4fde-88e7-0fa8ad253ebf)
+
+Faculty Panel - 
+
+![WhatsApp Image 2025-03-27 at 12 47 35_05d8402e](https://github.com/user-attachments/assets/a0567530-f825-47c5-9dd0-db2d9f1b6364)
+![WhatsApp Image 2025-03-27 at 12 47 57_d585182d](https://github.com/user-attachments/assets/4aee9a7c-d8ee-43ac-8cd3-c900debb4f4a)
+![WhatsApp Image 2025-03-27 at 12 48 25_06213c49](https://github.com/user-attachments/assets/0d70fa2a-7713-4783-9d09-a689545e5841)
+![WhatsApp Image 2025-03-27 at 12 48 50_4a5a33e9](https://github.com/user-attachments/assets/c6554cd3-b9c4-42a1-8377-1f0fc0a122b1)
+
+Student Panel -
+
+![WhatsApp Image 2025-03-27 at 12 45 01_b355d34c](https://github.com/user-attachments/assets/490fd911-47ce-4ceb-8f1f-7587d363c093)
+![WhatsApp Image 2025-03-27 at 12 45 46_4628a10e](https://github.com/user-attachments/assets/dce78813-6e73-467a-a9fc-ab4d108f505c)
+![WhatsApp Image 2025-03-27 at 12 46 15_be0ac9a4](https://github.com/user-attachments/assets/6a04b966-475f-4413-a3f0-d5a6124c60a7)
 
 ## 🌟 Project Vision
 
