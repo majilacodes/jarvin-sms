@@ -22,9 +22,12 @@ Faculty Panel -
 
 Student Panel -
 
-![WhatsApp Image 2025-03-27 at 12 45 01_b355d34c](https://github.com/user-attachments/assets/490fd911-47ce-4ceb-8f1f-7587d363c093)
-![WhatsApp Image 2025-03-27 at 12 45 46_4628a10e](https://github.com/user-attachments/assets/dce78813-6e73-467a-a9fc-ab4d108f505c)
-![WhatsApp Image 2025-03-27 at 12 46 15_be0ac9a4](https://github.com/user-attachments/assets/6a04b966-475f-4413-a3f0-d5a6124c60a7)
+![WhatsApp Image 2025-03-27 at 14 08 32_6ab62935](https://github.com/user-attachments/assets/55a7262c-b19b-46ab-98db-fc1193b78e57)
+
+![WhatsApp Image 2025-03-27 at 14 09 09_fd726d10](https://github.com/user-attachments/assets/993c9e46-4fbf-4a8f-95c6-d91434cb4cb8)
+
+![WhatsApp Image 2025-03-27 at 15 35 04_54e61aa9](https://github.com/user-attachments/assets/a5691097-b0ba-4346-b137-a51186e0955f)
+
 
 ## 🌟 Project Vision
 
