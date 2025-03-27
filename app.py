@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 import re
 import os
 import sys
@@ -8,15 +8,18 @@ import sys
 app = Flask(__name__)
 
 app.secret_key = 'abcd21234455'  
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+app.config['SESSION_TYPE'] = 'filesystem'
 
 # Database initialization function
 def get_db():
     db = sqlite3.connect('python_sms.db')
-    db.row_factory = sqlite3.Row  # This allows accessing columns by name
+    db.row_factory = sqlite3.Row
     return db
 
 # Initialize the database schema
 def init_db():
+    print("Initializing database...")
     db = get_db()
     cursor = db.cursor()
     
@@ -144,14 +147,306 @@ def init_db():
             ('Assignment', 'Homework/Project assessment');
         ''')
     
-    # Add default admin user if none exists
-    cursor.execute('SELECT COUNT(*) FROM sms_user')
-    if cursor.fetchone()[0] == 0:
-        cursor.execute('''
-            INSERT INTO sms_user (first_name, email, password, type, status)
-            VALUES (?, ?, ?, ?, ?)
-        ''', ('Admin', 'admin@example.com', 'admin123', 'admin', 'active'))
+    # Add sample data only if tables are empty
     
+    # 1. Add users (admin + faculty)
+    cursor.execute('SELECT COUNT(*) FROM sms_user')
+    user_count = cursor.fetchone()[0]
+    print(f"Current user count: {user_count}")
+    
+    if user_count == 0:
+        print("Creating admin user...")
+        cursor.executescript('''
+            INSERT INTO sms_user (first_name, email, password, type, status) VALUES 
+            ('Admin', 'admin@college.ac.in', 'admin123', 'admin', 'active'),
+            ('Dr. Rajesh Kumar', 'rajesh.kumar@college.ac.in', 'faculty123', 'teacher', 'active'),
+            ('Dr. Priya Sharma', 'priya.sharma@college.ac.in', 'faculty123', 'teacher', 'active'),
+            ('Prof. Amit Patel', 'amit.patel@college.ac.in', 'faculty123', 'teacher', 'active'),
+            ('Dr. Sunita Verma', 'sunita.verma@college.ac.in', 'faculty123', 'teacher', 'active'),
+            ('Prof. Deepak Singh', 'deepak.singh@college.ac.in', 'faculty123', 'teacher', 'active');
+        ''')
+
+    # 2. Add engineering subjects
+    cursor.execute('SELECT COUNT(*) FROM sms_subjects')
+    if cursor.fetchone()[0] == 0:
+        cursor.executescript('''
+            INSERT INTO sms_subjects (subject, type, code) VALUES 
+            ('Data Structures', 'Core', 'CS201'),
+            ('Digital Electronics', 'Core', 'EC201'),
+            ('Engineering Mathematics', 'Core', 'MA201'),
+            ('Computer Networks', 'Core', 'CS301'),
+            ('Database Management', 'Core', 'CS302'),
+            ('Machine Learning', 'Elective', 'CS401'),
+            ('Artificial Intelligence', 'Elective', 'CS402'),
+            ('VLSI Design', 'Core', 'EC301'),
+            ('Operating Systems', 'Core', 'CS303'),
+            ('Software Engineering', 'Core', 'CS304'),
+            ('Web Technologies', 'Elective', 'CS403'),
+            ('Cloud Computing', 'Elective', 'CS404'),
+            ('Cyber Security', 'Elective', 'CS405'),
+            ('IoT Systems', 'Elective', 'EC401'),
+            ('Microprocessors', 'Core', 'EC202'),
+            ('Computer Architecture', 'Core', 'CS202'),
+            ('Theory of Computation', 'Core', 'CS305'),
+            ('Compiler Design', 'Core', 'CS306'),
+            ('Data Mining', 'Elective', 'CS406'),
+            ('Mobile Computing', 'Elective', 'CS407');
+        ''')
+
+    # 3. Add sections
+    cursor.execute('SELECT COUNT(*) FROM sms_section')
+    if cursor.fetchone()[0] == 0:
+        cursor.executescript('''
+            INSERT INTO sms_section (section) VALUES 
+            ('A'), ('B'), ('C'), ('D'), ('E');
+        ''')
+
+    # 4. Add faculty members
+    cursor.execute('SELECT COUNT(*) FROM sms_teacher')
+    if cursor.fetchone()[0] == 0:
+        cursor.executescript('''
+            INSERT INTO sms_teacher (teacher, subject_id) VALUES 
+            ('Dr. Rajesh Kumar', 1),
+            ('Dr. Priya Sharma', 2),
+            ('Prof. Amit Patel', 3),
+            ('Dr. Sunita Verma', 4),
+            ('Prof. Deepak Singh', 5),
+            ('Dr. Anita Desai', 6),
+            ('Prof. Suresh Yadav', 7),
+            ('Dr. Meena Iyer', 8),
+            ('Prof. Rakesh Gupta', 9),
+            ('Dr. Neha Kapoor', 10),
+            ('Prof. Vikram Singh', 11),
+            ('Dr. Anjali Mehta', 12),
+            ('Prof. Sanjay Verma', 13),
+            ('Dr. Pooja Reddy', 14),
+            ('Prof. Arun Kumar', 15),
+            ('Dr. Kavita Sharma', 16),
+            ('Prof. Rahul Mishra', 17),
+            ('Dr. Shweta Joshi', 18),
+            ('Prof. Manoj Tiwari', 19),
+            ('Dr. Ritu Patel', 20);
+        ''')
+
+    # 5. Add engineering classes/branches
+    cursor.execute('SELECT COUNT(*) FROM sms_classes')
+    if cursor.fetchone()[0] == 0:
+        cursor.executescript('''
+            INSERT INTO sms_classes (name, code, section, teacher_id) VALUES 
+            ('CSE 1st Year', 'CSE1', 1, 1),
+            ('CSE 2nd Year', 'CSE2', 2, 2),
+            ('CSE 3rd Year', 'CSE3', 3, 3),
+            ('CSE 4th Year', 'CSE4', 4, 4),
+            ('ECE 1st Year', 'ECE1', 1, 5),
+            ('ECE 2nd Year', 'ECE2', 2, 6),
+            ('ECE 3rd Year', 'ECE3', 3, 7),
+            ('ECE 4th Year', 'ECE4', 4, 8),
+            ('IT 1st Year', 'IT1', 1, 9),
+            ('IT 2nd Year', 'IT2', 2, 10),
+            ('IT 3rd Year', 'IT3', 3, 11),
+            ('IT 4th Year', 'IT4', 4, 12),
+            ('ME 1st Year', 'ME1', 1, 13),
+            ('ME 2nd Year', 'ME2', 2, 14),
+            ('ME 3rd Year', 'ME3', 3, 15),
+            ('ME 4th Year', 'ME4', 4, 16),
+            ('EE 1st Year', 'EE1', 1, 17),
+            ('EE 2nd Year', 'EE2', 2, 18),
+            ('EE 3rd Year', 'EE3', 3, 19),
+            ('EE 4th Year', 'EE4', 4, 20);
+        ''')
+
+    # 6. Add students
+    cursor.execute('SELECT COUNT(*) FROM sms_students')
+    if cursor.fetchone()[0] == 0:
+        cursor.executescript('''
+            INSERT INTO sms_students (
+                admission_no, roll_no, name, gender, dob, mobile, email,
+                current_address, father_name, mother_name, admission_date,
+                academic_year, class, section
+            ) VALUES 
+            ('2023CSE001', '001', 'Aarav Sharma', 'Male', '2003-05-15', '9876543210', 'aarav.s@college.ac.in', 'Mumbai, Maharashtra', 'Rajesh Sharma', 'Priya Sharma', '2023-08-01', '2023-24', 1, 1),
+            ('2023CSE002', '002', 'Diya Patel', 'Female', '2003-06-20', '9876543211', 'diya.p@college.ac.in', 'Ahmedabad, Gujarat', 'Amit Patel', 'Meena Patel', '2023-08-01', '2023-24', 1, 1),
+            ('2023CSE003', '003', 'Arjun Singh', 'Male', '2003-07-10', '9876543212', 'arjun.s@college.ac.in', 'Delhi, Delhi', 'Vikram Singh', 'Anjali Singh', '2023-08-01', '2023-24', 1, 2),
+            ('2023ECE001', '004', 'Ananya Kumar', 'Female', '2003-08-25', '9876543213', 'ananya.k@college.ac.in', 'Bangalore, Karnataka', 'Deepak Kumar', 'Sunita Kumar', '2023-08-01', '2023-24', 5, 1),
+            ('2023ECE002', '005', 'Rohan Verma', 'Male', '2003-09-30', '9876543214', 'rohan.v@college.ac.in', 'Chennai, Tamil Nadu', 'Suresh Verma', 'Pooja Verma', '2023-08-01', '2023-24', 5, 1),
+            ('2023IT001', '006', 'Ishaan Mehta', 'Male', '2003-10-15', '9876543215', 'ishaan.m@college.ac.in', 'Pune, Maharashtra', 'Rahul Mehta', 'Neha Mehta', '2023-08-01', '2023-24', 9, 1),
+            ('2023IT002', '007', 'Zara Khan', 'Female', '2003-11-20', '9876543216', 'zara.k@college.ac.in', 'Hyderabad, Telangana', 'Imran Khan', 'Fatima Khan', '2023-08-01', '2023-24', 9, 1),
+            ('2023ME001', '008', 'Vihaan Reddy', 'Male', '2003-12-05', '9876543217', 'vihaan.r@college.ac.in', 'Kolkata, West Bengal', 'Krishna Reddy', 'Lakshmi Reddy', '2023-08-01', '2023-24', 13, 1),
+            ('2023ME002', '009', 'Aisha Gupta', 'Female', '2004-01-10', '9876543218', 'aisha.g@college.ac.in', 'Jaipur, Rajasthan', 'Sanjay Gupta', 'Ritu Gupta', '2023-08-01', '2023-24', 13, 1),
+            ('2023EE001', '010', 'Kabir Joshi', 'Male', '2004-02-15', '9876543219', 'kabir.j@college.ac.in', 'Lucknow, UP', 'Anil Joshi', 'Shweta Joshi', '2023-08-01', '2023-24', 17, 1),
+            ('2022CSE001', '011', 'Myra Singh', 'Female', '2002-03-20', '9876543220', 'myra.s@college.ac.in', 'Chandigarh, Punjab', 'Harpreet Singh', 'Gurpreet Kaur', '2022-08-01', '2023-24', 2, 2),
+            ('2022ECE001', '012', 'Advait Mishra', 'Male', '2002-04-25', '9876543221', 'advait.m@college.ac.in', 'Bhopal, MP', 'Rajiv Mishra', 'Anjali Mishra', '2022-08-01', '2023-24', 6, 2),
+            ('2022IT001', '013', 'Kiara Kapoor', 'Female', '2002-05-30', '9876543222', 'kiara.k@college.ac.in', 'Indore, MP', 'Arun Kapoor', 'Priya Kapoor', '2022-08-01', '2023-24', 10, 2),
+            ('2021CSE001', '014', 'Reyansh Kumar', 'Male', '2001-06-05', '9876543223', 'reyansh.k@college.ac.in', 'Patna, Bihar', 'Manoj Kumar', 'Seema Kumar', '2021-08-01', '2023-24', 3, 3),
+            ('2021ECE001', '015', 'Shanaya Iyer', 'Female', '2001-07-10', '9876543224', 'shanaya.i@college.ac.in', 'Trivandrum, Kerala', 'Krishnan Iyer', 'Meena Iyer', '2021-08-01', '2023-24', 7, 3),
+            ('2021IT001', '016', 'Vivaan Malhotra', 'Male', '2001-08-15', '9876543225', 'vivaan.m@college.ac.in', 'Nagpur, Maharashtra', 'Rohit Malhotra', 'Pooja Malhotra', '2021-08-01', '2023-24', 11, 3),
+            ('2020CSE001', '017', 'Anvi Desai', 'Female', '2000-09-20', '9876543226', 'anvi.d@college.ac.in', 'Surat, Gujarat', 'Mihir Desai', 'Rekha Desai', '2020-08-01', '2023-24', 4, 4),
+            ('2020ECE001', '018', 'Dhruv Chatterjee', 'Male', '2000-10-25', '9876543227', 'dhruv.c@college.ac.in', 'Guwahati, Assam', 'Abhijit Chatterjee', 'Mitali Chatterjee', '2020-08-01', '2023-24', 8, 4),
+            ('2020IT001', '019', 'Saanvi Rao', 'Female', '2000-11-30', '9876543228', 'saanvi.r@college.ac.in', 'Visakhapatnam, AP', 'Venkat Rao', 'Padma Rao', '2020-08-01', '2023-24', 12, 4),
+            ('2020ME001', '020', 'Yash Tiwari', 'Male', '2000-12-05', '9876543229', 'yash.t@college.ac.in', 'Raipur, Chhattisgarh', 'Prakash Tiwari', 'Savita Tiwari', '2020-08-01', '2023-24', 16, 4);
+        ''')
+
+    # 7. Add attendance records (for last 30 days)
+    cursor.execute('SELECT COUNT(*) FROM sms_attendance')
+    if cursor.fetchone()[0] == 0:
+        # Get current date and generate dates for last 30 days
+        from datetime import datetime, timedelta
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
+        
+        for student_id in range(1, 21):
+            current_date = start_date
+            while current_date <= end_date:
+                # Create realistic attendance patterns
+                if student_id % 5 == 0:  # Students with poor attendance (80%)
+                    status = 'present' if current_date.weekday() < 4 else 'absent'
+                elif student_id % 3 == 0:  # Students with excellent attendance (95%)
+                    status = 'absent' if current_date.weekday() == 4 and current_date.day % 15 == 0 else 'present'
+                else:  # Regular students (90%)
+                    status = 'absent' if current_date.weekday() == 4 and current_date.day % 10 == 0 else 'present'
+                
+                # Don't mark attendance for weekends
+                if current_date.weekday() < 5:  # Monday to Friday
+                    cursor.execute('''
+                        INSERT INTO sms_attendance (student_id, attendance_status, attendance_date)
+                        VALUES (?, ?, ?)
+                    ''', (student_id, status, current_date.strftime('%Y-%m-%d')))
+                
+                current_date += timedelta(days=1)
+
+    # 8. Add comprehensive exam records
+    cursor.execute('SELECT COUNT(*) FROM sms_exam_results')
+    if cursor.fetchone()[0] == 0:
+        # First add more exam types if not exists
+        cursor.executescript('''
+            INSERT OR IGNORE INTO sms_exam_types (name, description) VALUES 
+            ('Lab Test', 'Practical laboratory examination'),
+            ('Project Review', 'Project progress evaluation'),
+            ('Viva', 'Oral examination');
+        ''')
+        
+        # Add various types of exams
+        cursor.executescript('''
+            -- Midterm Exams (Multiple subjects)
+            INSERT INTO sms_exams (exam_type_id, class_id, subject_id, exam_date, total_marks, passing_marks, academic_year, status) VALUES 
+            (1, 1, 1, '2024-02-01', 100, 40, '2023-24', 'upcoming'),
+            (1, 1, 2, '2024-02-03', 100, 40, '2023-24', 'upcoming'),
+            (1, 1, 3, '2024-02-05', 100, 40, '2023-24', 'upcoming'),
+            (1, 2, 4, '2024-02-07', 100, 40, '2023-24', 'upcoming'),
+            (1, 2, 5, '2024-02-09', 100, 40, '2023-24', 'upcoming'),
+            (1, 3, 6, '2024-02-11', 100, 40, '2023-24', 'upcoming'),
+            (1, 3, 7, '2024-02-13', 100, 40, '2023-24', 'upcoming'),
+            (1, 4, 8, '2024-02-15', 100, 40, '2023-24', 'upcoming');
+        ''')
+
+        # Add Lab Tests
+        cursor.executescript('''
+            INSERT INTO sms_exams (exam_type_id, class_id, subject_id, exam_date, total_marks, passing_marks, academic_year, status) VALUES 
+            (5, 1, 1, '2024-01-05', 50, 25, '2023-24', 'completed'),
+            (5, 1, 2, '2024-01-12', 50, 25, '2023-24', 'completed'),
+            (5, 2, 3, '2024-01-19', 50, 25, '2023-24', 'completed'),
+            (5, 2, 4, '2024-01-26', 50, 25, '2023-24', 'completed');
+        ''')
+
+        # Add Project Reviews
+        cursor.executescript('''
+            INSERT INTO sms_exams (exam_type_id, class_id, subject_id, exam_date, total_marks, passing_marks, academic_year, status) VALUES 
+            (6, 3, 5, '2024-01-08', 100, 50, '2023-24', 'completed'),
+            (6, 3, 6, '2024-01-15', 100, 50, '2023-24', 'completed'),
+            (6, 4, 7, '2024-01-22', 100, 50, '2023-24', 'completed'),
+            (6, 4, 8, '2024-01-29', 100, 50, '2023-24', 'completed');
+        ''')
+
+        # Function to generate realistic marks based on student pattern
+        def get_student_performance(student_id, total_marks):
+            base_performance = {
+                0: (0.85, 0.95),  # Excellent students (85-95%)
+                1: (0.75, 0.85),  # Good students (75-85%)
+                2: (0.65, 0.75),  # Average students (65-75%)
+                3: (0.55, 0.65)   # Below average students (55-65%)
+            }
+            import random
+            performance_range = base_performance[student_id % 4]
+            percentage = random.uniform(performance_range[0], performance_range[1])
+            return round(total_marks * percentage)
+
+        # Add results for completed exams
+        for exam_id in range(1, 13):  # For all completed exams
+            for student_id in range(1, 21):  # For all 20 students
+                # Get exam details
+                cursor.execute('SELECT total_marks FROM sms_exams WHERE id = ?', (exam_id,))
+                exam = cursor.fetchone()
+                if exam:
+                    total_marks = exam[0]
+                    marks = get_student_performance(student_id, total_marks)
+                    
+                    # Calculate grade based on percentage
+                    percentage = (marks / total_marks) * 100
+                    if percentage >= 90:
+                        grade = 'A+'
+                        remarks = 'Outstanding performance'
+                    elif percentage >= 80:
+                        grade = 'A'
+                        remarks = 'Excellent work'
+                    elif percentage >= 70:
+                        grade = 'B+'
+                        remarks = 'Very good performance'
+                    elif percentage >= 60:
+                        grade = 'B'
+                        remarks = 'Good effort'
+                    elif percentage >= 50:
+                        grade = 'C'
+                        remarks = 'Average performance'
+                    else:
+                        grade = 'F'
+                        remarks = 'Needs improvement'
+
+                    cursor.execute('''
+                        INSERT INTO sms_exam_results 
+                        (exam_id, student_id, marks_obtained, grade, remarks)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (exam_id, student_id, marks, grade, remarks))
+
+        # Add some special remarks for random students
+        special_remarks = [
+            "Exceptional problem-solving skills",
+            "Shows great improvement",
+            "Needs to focus more on practical aspects",
+            "Outstanding project implementation",
+            "Good theoretical understanding",
+            "Excellent laboratory work",
+            "Needs more practice with coding",
+            "Shows leadership qualities",
+            "Very creative approach to problems",
+            "Good team player"
+        ]
+        
+        import random
+        for student_id in range(1, 21):
+            # Update random exam results with special remarks
+            for _ in range(2):  # 2 special remarks per student
+                exam_id = random.randint(1, 12)
+                remark = random.choice(special_remarks)
+                cursor.execute('''
+                    UPDATE sms_exam_results 
+                    SET remarks = ? 
+                    WHERE student_id = ? AND exam_id = ?
+                ''', (remark, student_id, exam_id))
+
+    # Verify admin user creation
+    cursor.execute('SELECT COUNT(*) FROM sms_user')
+    user_count = cursor.fetchone()[0]
+    print(f"Current user count: {user_count}")
+    
+    if user_count == 0:
+        print("Creating admin user...")
+        cursor.execute('''
+            INSERT INTO sms_user (first_name, email, password, type, status) 
+            VALUES (?, ?, ?, ?, ?)
+        ''', ('Admin', 'admin@college.ac.in', 'admin123', 'admin', 'active'))
+        db.commit()
+        print("Admin user created successfully")
+
     db.commit()
     db.close()
 
@@ -159,59 +454,86 @@ def init_db():
 init_db()
 
 @app.route('/')
-@app.route('/login', methods =['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    message = ''  # Fixed typo in variable name
-    if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
-        email = request.form['email']        
-        password = request.form['password']
-        
-        db = get_db()
-        cursor = db.cursor()
-        
-        # Add error handling for database connection
+    # Clear any existing session
+    session.clear()
+    
+    message = ''
+    if request.method == 'POST':
         try:
-            # Simplified query and removed status check initially for debugging
-            cursor.execute('SELECT * FROM sms_user WHERE email = ? AND password = ?', 
-                         (email, password))
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '').strip()
+            
+            # Debug print
+            print(f"Login attempt - Email: {email}")
+            
+            if not email or not password:
+                message = 'Please fill both email and password fields!'
+                return render_template('login.html', message=message)
+            
+            db = get_db()
+            cursor = db.cursor()
+            
+            # Debug print
+            cursor.execute('SELECT COUNT(*) FROM sms_user')
+            total_users = cursor.fetchone()[0]
+            print(f"Total users in database: {total_users}")
+            
+            # Check if user exists
+            cursor.execute('SELECT * FROM sms_user WHERE email = ?', (email,))
             user = cursor.fetchone()
             
             if user:
-                # Convert SQLite Row to dict for easier access
-                user_dict = dict(user)
+                # Debug print
+                print(f"User found: {user['first_name']}")
                 
-                session['loggedin'] = True
-                session['userid'] = user_dict['id']
-                session['name'] = user_dict['first_name']
-                session['email'] = user_dict['email']
-                session['role'] = user_dict['type']
-                
-                message = 'Logged in successfully!'            
-                return redirect(url_for('dashboard'))
+                # Check password
+                if user['password'] == password:
+                    # Set session variables
+                    session['loggedin'] = True
+                    session['userid'] = user['id']
+                    session['name'] = user['first_name']
+                    session['email'] = user['email']
+                    session['role'] = user['type']
+                    
+                    # Debug print
+                    print(f"Session variables set: {session}")
+                    
+                    db.close()
+                    return redirect(url_for('dashboard'))
+                else:
+                    message = 'Incorrect password!'
             else:
-                message = 'Invalid email or password!'
+                message = 'Email not found!'
                 
         except Exception as e:
-            message = f'Database error: {str(e)}'
-        finally:
-            db.close()
+            message = f'An error occurred: {str(e)}'
+            print(f"Login error: {str(e)}")  # For debugging
             
-    return render_template('login.html', message=message)  # Fixed variable name
-    
+        finally:
+            if 'db' in locals():
+                db.close()
+            
+    return render_template('login.html', message=message)
+
 @app.route('/logout')
 def logout():
-    session.pop('loggedin', None)
-    session.pop('userid', None)
-    session.pop('email', None)
-    session.pop('name', None)
-    session.pop('role', None)
+    # Clear the session
+    session.clear()
+    # Redirect to login page
     return redirect(url_for('login'))
-    
-@app.route("/dashboard", methods =['GET', 'POST'])
+
+@app.route('/dashboard')
 def dashboard():
-    if 'loggedin' in session:        
-        return render_template("dashboard.html")
-    return redirect(url_for('login'))    
+    # Debug print
+    print(f"Dashboard access - Session: {session}")
+    
+    if 'loggedin' not in session:
+        print("No login session found")
+        return redirect(url_for('login'))
+        
+    return render_template('dashboard.html')
 
 ########################### Techer section ##################################
 
@@ -249,32 +571,42 @@ def edit_teacher():
         return render_template("edit_teacher.html", teachers = teachers, subjects = subjects)
     return redirect(url_for('login'))  
     
-@app.route("/save_teacher", methods =['GET', 'POST'])
+@app.route("/save_teacher", methods=['GET', 'POST'])
 def save_teacher():
     if 'loggedin' in session:    
         if request.method == 'POST' and 'techer_name' in request.form and 'specialization' in request.form:
-            techer_name = request.form['techer_name'] 
-            specialization = request.form['specialization']             
-            action = request.form['action']             
+            teacher_name = request.form['techer_name'].strip()
+            specialization = request.form['specialization']
             
+            if not teacher_name:
+                return redirect(url_for('teacher'))
+                
             db = get_db()
             cursor = db.cursor()
             
-            if action == 'updateTeacher':
-                teacherid = request.form['teacherid'] 
-                cursor.execute('UPDATE sms_teacher SET teacher = ?, subject_id = ? WHERE teacher_id = ?', 
-                             (techer_name, specialization, teacherid))
-            else: 
-                cursor.execute('INSERT INTO sms_teacher (teacher, subject_id) VALUES (?, ?)', 
-                             (techer_name, specialization))
-            
-            db.commit()
-            db.close()
-            return redirect(url_for('teacher'))        
-        elif request.method == 'POST':
-            msg = 'Please fill out the form field !'        
-        return redirect(url_for('teacher'))        
-    return redirect(url_for('login')) 
+            try:
+                if request.form['action'] == 'updateTeacher':
+                    teacherid = request.form['teacherid']
+                    cursor.execute('''
+                        UPDATE sms_teacher 
+                        SET teacher = ?, subject_id = ? 
+                        WHERE teacher_id = ?''',
+                        (teacher_name, specialization, teacherid))
+                else:
+                    cursor.execute('''
+                        INSERT INTO sms_teacher (teacher, subject_id) 
+                        VALUES (?, ?)''',
+                        (teacher_name, specialization))
+                
+                db.commit()
+            except Exception as e:
+                print(f"Error saving teacher: {e}")
+            finally:
+                db.close()
+                
+            return redirect(url_for('teacher'))
+                
+    return redirect(url_for('login'))
     
 @app.route("/delete_teacher", methods =['GET'])
 def delete_teacher():
@@ -301,30 +633,43 @@ def subject():
         return render_template("subject.html", subjects = subjects)
     return redirect(url_for('login'))
     
-@app.route("/save_subject", methods =['GET', 'POST'])
+@app.route("/save_subject", methods=['GET', 'POST'])
 def save_subject():
     if 'loggedin' in session:    
-        db = get_db()
-        cursor = db.cursor()        
         if request.method == 'POST' and 'subject' in request.form and 's_type' in request.form and 'code' in request.form:
-            subject = request.form['subject'] 
-            s_type = request.form['s_type'] 
-            code = request.form['code']               
-            action = request.form['action']             
+            subject = request.form['subject'].strip()
+            s_type = request.form['s_type'].strip()
+            code = request.form['code'].strip()
             
-            if action == 'updateSubject':
-                subjectid = request.form['subjectid'] 
-                cursor.execute('UPDATE sms_subjects SET subject = ?, type = ?, code = ? WHERE subject_id  =?', (subject, s_type, code, subjectid))
-            else: 
-                cursor.execute('INSERT INTO sms_subjects (subject, type, code) VALUES (?, ?, ?)', (subject, s_type, code))
+            if not all([subject, s_type, code]):
+                return redirect(url_for('subject'))
+                
+            db = get_db()
+            cursor = db.cursor()        
             
-            db.commit()
-            db.close()
-            return redirect(url_for('subject'))        
-        elif request.method == 'POST':
-            msg = 'Please fill out the form field !'        
-        return redirect(url_for('subject'))        
-    return redirect(url_for('login')) 
+            try:
+                if request.form['action'] == 'updateSubject':
+                    subjectid = request.form['subjectid']
+                    cursor.execute('''
+                        UPDATE sms_subjects 
+                        SET subject = ?, type = ?, code = ? 
+                        WHERE subject_id = ?''', 
+                        (subject, s_type, code, subjectid))
+                else:
+                    cursor.execute('''
+                        INSERT INTO sms_subjects (subject, type, code) 
+                        VALUES (?, ?, ?)''', 
+                        (subject, s_type, code))
+                
+                db.commit()
+            except Exception as e:
+                print(f"Error saving subject: {e}")
+            finally:
+                db.close()
+                
+            return redirect(url_for('subject'))
+                    
+    return redirect(url_for('login'))
 
 @app.route("/edit_subject", methods =['GET'])
 def edit_subject():
@@ -540,82 +885,76 @@ def edit_student():
         return render_template("edit_student.html", students = students, classes = classes, sections = sections)
     return redirect(url_for('login'))  
 
-@app.route("/save_student", methods =['GET', 'POST'])
+@app.route("/save_student", methods=['GET', 'POST'])
 def save_student():
     if 'loggedin' in session:    
-        db = get_db()
-        cursor = db.cursor()        
-        if request.method == 'POST' and 'name' in request.form and 'class_id' in request.form and 'section_id' in request.form:
-            admission_no = request.form['admission_no']
-            roll_no = request.form['roll_no']
-            name = request.form['name']
-            gender = request.form['gender']
-            dob = request.form['dob']
-            mobile = request.form['mobile']
-            email = request.form['email']
-            current_address = request.form['current_address']
-            father_name = request.form['father_name']
-            mother_name = request.form['mother_name']
-            admission_date = request.form['admission_date']
-            academic_year = request.form['academic_year']
-            class_id = request.form['class_id']
-            section_id = request.form['section_id']
-            
-            # Handle photo upload
-            photo = ""
-            if 'photo' in request.files:
-                photo_file = request.files['photo']
-                if photo_file.filename != '':
-                    # Create uploads directory if it doesn't exist
-                    if not os.path.exists('static/uploads'):
-                        os.makedirs('static/uploads')
-                    photo = f"uploads/{admission_no}_{photo_file.filename}"
-                    photo_file.save(os.path.join('static', photo))
-            
-            action = request.form['action']             
-            
-            if action == 'updateStudent':
-                student_id = request.form['student_id']
-                if photo:
-                    cursor.execute('''
-                        UPDATE sms_students 
-                        SET admission_no=?, roll_no=?, name=?, gender=?, dob=?, 
-                            mobile=?, email=?, current_address=?, father_name=?, 
-                            mother_name=?, admission_date=?, academic_year=?, 
-                            class=?, section=?, photo=? 
-                        WHERE id=?
-                    ''', (admission_no, roll_no, name, gender, dob, mobile, email, 
-                         current_address, father_name, mother_name, admission_date, 
-                         academic_year, class_id, section_id, photo, student_id))
+        if request.method == 'POST' and all(k in request.form for k in ['name', 'class_id', 'section_id']):
+            try:
+                # Get form data
+                student_data = {
+                    'admission_no': request.form['admission_no'].strip(),
+                    'roll_no': request.form['roll_no'].strip(),
+                    'name': request.form['name'].strip(),
+                    'gender': request.form['gender'],
+                    'dob': request.form['dob'],
+                    'mobile': request.form['mobile'].strip(),
+                    'email': request.form['email'].strip(),
+                    'current_address': request.form['current_address'].strip(),
+                    'father_name': request.form['father_name'].strip(),
+                    'mother_name': request.form['mother_name'].strip(),
+                    'admission_date': request.form['admission_date'],
+                    'academic_year': request.form['academic_year'],
+                    'class_id': request.form['class_id'],
+                    'section_id': request.form['section_id']
+                }
+                
+                # Validate required fields
+                if not all([student_data['name'], student_data['admission_no'], student_data['class_id']]):
+                    return redirect(url_for('student'))
+                
+                # Handle photo upload
+                photo = ""
+                if 'photo' in request.files:
+                    photo_file = request.files['photo']
+                    if photo_file.filename:
+                        if not os.path.exists('static/uploads'):
+                            os.makedirs('static/uploads')
+                        photo = f"uploads/{student_data['admission_no']}_{photo_file.filename}"
+                        photo_file.save(os.path.join('static', photo))
+                
+                db = get_db()
+                cursor = db.cursor()
+                
+                if request.form['action'] == 'updateStudent':
+                    student_id = request.form['student_id']
+                    update_fields = list(student_data.keys())
+                    if photo:
+                        update_fields.append('photo')
+                        student_data['photo'] = photo
+                    
+                    query = f'''UPDATE sms_students SET 
+                        {', '.join(f'{field} = ?' for field in update_fields)}
+                        WHERE id = ?'''
+                    
+                    cursor.execute(query, list(student_data.values()) + [student_id])
                 else:
-                    cursor.execute('''
-                        UPDATE sms_students 
-                        SET admission_no=?, roll_no=?, name=?, gender=?, dob=?, 
-                            mobile=?, email=?, current_address=?, father_name=?, 
-                            mother_name=?, admission_date=?, academic_year=?, 
-                            class=?, section=? 
-                        WHERE id=?
-                    ''', (admission_no, roll_no, name, gender, dob, mobile, email, 
-                         current_address, father_name, mother_name, admission_date, 
-                         academic_year, class_id, section_id, student_id))
-            else: 
-                cursor.execute('''
-                    INSERT INTO sms_students 
-                    (admission_no, roll_no, name, photo, gender, dob, mobile, 
-                     email, current_address, father_name, mother_name, 
-                     admission_date, academic_year, class, section) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (admission_no, roll_no, name, photo, gender, dob, mobile, 
-                     email, current_address, father_name, mother_name, 
-                     admission_date, academic_year, class_id, section_id))
-            
-            db.commit()
-            db.close()
-            return redirect(url_for('student'))        
-        elif request.method == 'POST':
-            msg = 'Please fill out all required fields!'        
-        return redirect(url_for('student'))        
-    return redirect(url_for('login'))     
+                    student_data['photo'] = photo
+                    fields = list(student_data.keys())
+                    query = f'''INSERT INTO sms_students 
+                        ({', '.join(fields)}) 
+                        VALUES ({', '.join(['?'] * len(fields))})'''
+                    
+                    cursor.execute(query, list(student_data.values()))
+                
+                db.commit()
+                db.close()
+                return redirect(url_for('student'))
+                
+            except Exception as e:
+                print(f"Error saving student: {e}")
+                return redirect(url_for('student'))
+                
+    return redirect(url_for('login'))
     
 @app.route("/delete_student", methods =['GET'])
 def delete_student():
@@ -786,7 +1125,7 @@ def assign_faculty():
     assignments = []
     
     # Get all courses
-    conn = get_db_connection()
+    conn = get_db()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM subjects ORDER BY name")
     courses = cursor.fetchall()
@@ -842,7 +1181,7 @@ def manage_schedules():
     schedules = []
     
     # Get all schedules
-    conn = get_db_connection()
+    conn = get_db()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
         SELECT s.id, s.class_id, c.name as class_name, s.section_id, sec.section as section_name,
@@ -911,7 +1250,7 @@ def allocate_resources():
     allocations = []
     
     # Connect to database
-    conn = get_db_connection()
+    conn = get_db()
     cursor = conn.cursor(dictionary=True)
     
     # Get all resources
@@ -989,19 +1328,29 @@ def save_classes():
         if request.method == 'POST':
             class_name = request.form.get('className')
             class_code = request.form.get('classCode')
+            section_id = request.form.get('sectionid', None)  # Added section
+            teacher_id = request.form.get('teacherid', None)  # Added teacher
             action = request.form.get('action')
             
+            if not class_name:
+                return jsonify({'error': 'Class name is required'}), 400
+                
             db = get_db()
             cursor = db.cursor()
             
             try:
                 if action == 'updateClass':
                     class_id = request.form.get('classid')
-                    cursor.execute('UPDATE sms_classes SET name = ?, code = ? WHERE id = ?',
-                                 (class_name, class_code, class_id))
+                    cursor.execute('''
+                        UPDATE sms_classes 
+                        SET name = ?, code = ?, section = ?, teacher_id = ? 
+                        WHERE id = ?''',
+                        (class_name, class_code, section_id, teacher_id, class_id))
                 else:
-                    cursor.execute('INSERT INTO sms_classes (name, code) VALUES (?, ?)',
-                                 (class_name, class_code))
+                    cursor.execute('''
+                        INSERT INTO sms_classes (name, code, section, teacher_id) 
+                        VALUES (?, ?, ?, ?)''',
+                        (class_name, class_code, section_id, teacher_id))
                 
                 db.commit()
                 return jsonify({'success': True})
@@ -1156,6 +1505,44 @@ def grade_exam(exam_id):
     db.close()
     
     return render_template('grade_exam.html', exam=exam, students=students)
+
+def calculate_grade(marks, total_marks=100):
+    percentage = (marks / total_marks) * 100
+    if percentage >= 90:
+        return 'A+'
+    elif percentage >= 80:
+        return 'A'
+    elif percentage >= 70:
+        return 'B'
+    elif percentage >= 60:
+        return 'C'
+    elif percentage >= 50:
+        return 'D'
+    else:
+        return 'F'
+
+def safe_execute(query, params=None, fetchall=True):
+    """Execute SQL safely with automatic connection handling"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        
+        result = cursor.fetchall() if fetchall else cursor.fetchone()
+        db.commit()
+        return result
+    except Exception as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        db.close()
+
+def validate_required_fields(form_data, required_fields):
+    """Validate that all required fields are present and not empty"""
+    return all(form_data.get(field, '').strip() for field in required_fields)
 
 # Temporary code to reinitialize database
 if __name__ == "__main__":
