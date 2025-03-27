@@ -2,19 +2,23 @@
 
  Admin Panel - 
  
+![WhatsApp Image 2025-03-27 at 15 35 03_caf7355c](https://github.com/user-attachments/assets/b40ac28b-cd07-4d40-a182-e085b753eb6b)
+![WhatsApp Image 2025-03-27 at 15 35 03_cb57ca02](https://github.com/user-attachments/assets/a7918b1d-0031-4080-8630-296ec0f0fc9b)
+![WhatsApp Image 2025-03-27 at 15 35 04_b2f59a66](https://github.com/user-attachments/assets/917036f2-8045-4c9b-80e2-28bae930505e)
+![WhatsApp Image 2025-03-27 at 15 35 04_c98dda93](https://github.com/user-attachments/assets/d19ac0e7-49c9-4be7-b044-b89af890203a)
+![WhatsApp Image 2025-03-27 at 15 35 05_6ab354c5](https://github.com/user-attachments/assets/71421d19-138a-4e0d-83b5-42270f8b4717)
+![WhatsApp Image 2025-03-27 at 15 35 06_6962e666](https://github.com/user-attachments/assets/462e8272-dceb-4c56-af8d-3fb8be44492b)
+![WhatsApp Image 2025-03-27 at 15 35 06_1966250f](https://github.com/user-attachments/assets/35b02344-6366-4012-b08e-3634284b4878)
+![WhatsApp Image 2025-03-27 at 15 35 06_a72f12bc](https://github.com/user-attachments/assets/ad932e7b-522e-4b12-8646-bc7c3ccba880)
+
+Faculty Panel - 
+
 ![WhatsApp Image 2025-03-27 at 14 24 13_1bdde213](https://github.com/user-attachments/assets/76ecdc77-a767-4741-abc8-7771381ee91b)
 ![WhatsApp Image 2025-03-27 at 14 24 30_074d47f3](https://github.com/user-attachments/assets/154ff9e0-bde2-4059-97ed-d60ef9837ef9)
 ![WhatsApp Image 2025-03-27 at 14 24 54_33e0827c](https://github.com/user-attachments/assets/bb07b597-a75f-41c0-b7f6-8940d727fb3e)
 ![WhatsApp Image 2025-03-27 at 14 25 27_2876e8c5](https://github.com/user-attachments/assets/a7b43a59-2577-4cc2-b0da-73ff7b0665e7)
 
 ![WhatsApp Image 2025-03-27 at 14 25 52_3c320f09](https://github.com/user-attachments/assets/bc184c5f-28a1-4d54-bd14-a58d63bf6764)
-
-Faculty Panel - 
-
-![WhatsApp Image 2025-03-27 at 12 47 35_05d8402e](https://github.com/user-attachments/assets/a0567530-f825-47c5-9dd0-db2d9f1b6364)
-![WhatsApp Image 2025-03-27 at 12 47 57_d585182d](https://github.com/user-attachments/assets/4aee9a7c-d8ee-43ac-8cd3-c900debb4f4a)
-![WhatsApp Image 2025-03-27 at 12 48 25_06213c49](https://github.com/user-attachments/assets/0d70fa2a-7713-4783-9d09-a689545e5841)
-![WhatsApp Image 2025-03-27 at 12 48 50_4a5a33e9](https://github.com/user-attachments/assets/c6554cd3-b9c4-42a1-8377-1f0fc0a122b1)
 
 Student Panel -
 
