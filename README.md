@@ -2,16 +2,12 @@
 
  Admin Panel - 
  
- ![Screenshot 2025-03-27 104423](https://github.com/user-attachments/assets/c73479b4-bdd4-4a68-9472-bc156626856b)
- ![Screenshot 2025-03-27 124524](https://github.com/user-attachments/assets/523e8b65-7bec-4c03-a4a1-783f682d8403)
-![Screenshot 2025-03-27 124609](https://github.com/user-attachments/assets/5c2e3fbd-acf8-4974-a916-951cacc8d9d3)
-![Screenshot 2025-03-27 124556](https://github.com/user-attachments/assets/193156c0-77db-465e-a1bb-85930152fd01)
-![Screenshot 2025-03-27 124548](https://github.com/user-attachments/assets/c28a3fd1-69b7-44c7-b59b-dcb35e6656cf)
-![Screenshot 2025-03-27 124539](https://github.com/user-attachments/assets/fb7592cf-3349-48f9-a73d-f9f296ec5521)
-![Screenshot 2025-03-27 124531](https://github.com/user-attachments/assets/db6cac32-cb29-49c9-bb4b-1966a5712777)
-![Screenshot 2025-03-27 124440](https://github.com/user-attachments/assets/6179dae0-daf7-4af6-a1c0-329e7a8f655c)
-![Screenshot 2025-03-27 124515](https://github.com/user-attachments/assets/8a514572-0b59-4f5d-9daa-3d9935a906ae)
-![Screenshot 2025-03-27 124501](https://github.com/user-attachments/assets/740f26a8-f475-42dd-bda8-1b3e35516549)
+![WhatsApp Image 2025-03-27 at 14 24 13_1bdde213](https://github.com/user-attachments/assets/76ecdc77-a767-4741-abc8-7771381ee91b)
+![WhatsApp Image 2025-03-27 at 14 24 30_074d47f3](https://github.com/user-attachments/assets/154ff9e0-bde2-4059-97ed-d60ef9837ef9)
+![WhatsApp Image 2025-03-27 at 14 24 54_33e0827c](https://github.com/user-attachments/assets/bb07b597-a75f-41c0-b7f6-8940d727fb3e)
+![WhatsApp Image 2025-03-27 at 14 25 27_2876e8c5](https://github.com/user-attachments/assets/a7b43a59-2577-4cc2-b0da-73ff7b0665e7)
+
+![WhatsApp Image 2025-03-27 at 14 25 52_3c320f09](https://github.com/user-attachments/assets/bc184c5f-28a1-4d54-bd14-a58d63bf6764)
 
 Faculty Panel - 
 
