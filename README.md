@@ -1,5 +1,5 @@
 # 🎓 Intelligent Campus Management System
-![alt text](https://drive.google.com/uc?id=<1tIH651kP3vVDUmPNpwtXDFEuN-j16-uj>)
+![Image](https://github.com/user-attachments/assets/b7b0a39d-6958-40b5-8acc-7de9aad820bd)
 ![alt text](https://drive.google.com/uc?id=<1N2QEhi1L0oR_i83TRNTQEj3fgxSST4iR>)
 ![alt text](https://drive.google.com/uc?id=<1kENVFydsVH8WqdjODzxEBXWcvgSQV-vw>)
 ![alt text](https://drive.google.com/uc?id=<1dyUp-_c3hLO72RCRHEJ7DIxO3zYadXq7>)
