@@ -1,6 +1,6 @@
- 🎓 Intelligent Campus Management System
+##Jarvin: AI-Driven Campus Management System
 
- Admin Panel - 
+##Admin Panel
  
 ![WhatsApp Image 2025-03-27 at 15 35 03_caf7355c](https://github.com/user-attachments/assets/b40ac28b-cd07-4d40-a182-e085b753eb6b)
 ![WhatsApp Image 2025-03-27 at 15 35 03_cb57ca02](https://github.com/user-attachments/assets/a7918b1d-0031-4080-8630-296ec0f0fc9b)
@@ -11,7 +11,7 @@
 ![WhatsApp Image 2025-03-27 at 15 35 06_1966250f](https://github.com/user-attachments/assets/35b02344-6366-4012-b08e-3634284b4878)
 ![WhatsApp Image 2025-03-27 at 15 35 06_a72f12bc](https://github.com/user-attachments/assets/ad932e7b-522e-4b12-8646-bc7c3ccba880)
 
-Faculty Panel - 
+##Faculty Panel
 
 ![WhatsApp Image 2025-03-27 at 14 24 13_1bdde213](https://github.com/user-attachments/assets/76ecdc77-a767-4741-abc8-7771381ee91b)
 ![WhatsApp Image 2025-03-27 at 14 24 30_074d47f3](https://github.com/user-attachments/assets/154ff9e0-bde2-4059-97ed-d60ef9837ef9)
@@ -20,7 +20,7 @@ Faculty Panel -
 
 ![WhatsApp Image 2025-03-27 at 14 25 52_3c320f09](https://github.com/user-attachments/assets/bc184c5f-28a1-4d54-bd14-a58d63bf6764)
 
-Student Panel -
+##Student Panel
 
 ![WhatsApp Image 2025-03-27 at 14 08 32_6ab62935](https://github.com/user-attachments/assets/55a7262c-b19b-46ab-98db-fc1193b78e57)
 
