@@ -414,7 +414,7 @@ def delete_class():
         class_id = request.args.get('class_id') 
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('DELETE FROM sms_classes WHERE id = ?', (class_id, ))
+        cursor.execute('DELETE FROM sms_classes WHERE id = ?', (class_id,))
         db.commit()   
         db.close()
         return redirect(url_for('classes'))
