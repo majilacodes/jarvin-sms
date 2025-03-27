@@ -1,0 +1,126 @@
+/* Login Page Specific Styles */
+
+.auth-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-card {
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.bg-login-gradient {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-login-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/static/images/pattern.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.1;
+}
+
+.bg-login-gradient .lead {
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+.bg-login-gradient .fas.fa-school {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.bg-login-gradient .fas.fa-check-circle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+}
+
+/* Form styling */
+.form-control {
+    border-radius: var(--border-radius-sm);
+    padding: 0.75rem 1rem;
+    height: auto;
+}
+
+.input-group-text {
+    background-color: #f8f9fc;
+    border-color: #d1d3e2;
+}
+
+.btn-primary {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .auth-card {
+        margin: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .auth-wrapper {
+        padding: 10px;
+    }
+    
+    .auth-card {
+        box-shadow: var(--shadow-md);
+    }
+}
+
+/* Animation for the login form */
+.fadeInUp {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add some decorative elements */
+.corner-decoration {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+}
+
+.corner-decoration.top-left {
+    top: -75px;
+    left: -75px;
+}
+
+.corner-decoration.bottom-right {
+    bottom: -75px;
+    right: -75px;
+}

@@ -4,6 +4,8 @@ from datetime import date, timedelta
 import re
 import os
 import sys
+from utils.rag_utils import RAGSystem
+from functools import wraps  # For login_required decorator
     
 app = Flask(__name__)
 
@@ -11,11 +13,25 @@ app.secret_key = 'abcd21234455'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 app.config['SESSION_TYPE'] = 'filesystem'
 
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'loggedin' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # Database initialization function
 def get_db():
     db = sqlite3.connect('python_sms.db')
     db.row_factory = sqlite3.Row
     return db
+
+# Initialize the RAG system
+# This should be done once when the app starts
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyDvpOmdzcaLw1NIRtsNu1blC60-MLAUDO8")
+rag_system = RAGSystem("python_sms.db", GOOGLE_API_KEY)
 
 # Initialize the database schema
 def init_db():
@@ -1544,6 +1560,34 @@ def validate_required_fields(form_data, required_fields):
     """Validate that all required fields are present and not empty"""
     return all(form_data.get(field, '').strip() for field in required_fields)
 
+@app.route('/jarvin_ai')
+@login_required
+def jarvin_ai():
+    """Render the Jarvin AI assistant page"""
+    return render_template('jarvin_ai.html')
+
+@app.route('/jarvin_ai_query', methods=['POST'])
+@login_required
+def jarvin_ai_query():
+    """Process AI queries"""
+    data = request.json
+    user_query = data.get('query', '')
+    
+    try:
+        # Process the query using the RAG system
+        result = rag_system.query(user_query)
+        
+        return jsonify({
+            'status': 'success',
+            'response': result.get('answer', 'Sorry, I could not generate a response.')
+        })
+    except Exception as e:
+        print(f"Error processing query: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'response': 'Sorry, an error occurred while processing your request.'
+        })
+
 # Temporary code to reinitialize database
 if __name__ == "__main__":
     # Delete existing database if it exists
@@ -1551,5 +1595,5 @@ if __name__ == "__main__":
         os.remove('python_sms.db')
     # Initialize fresh database
     init_db()
-    app.run(port=5006, debug=True)
+    app.run(port=5007, debug=True)
 

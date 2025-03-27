@@ -1,22 +1,95 @@
-
 // Document ready function
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle sidebar
-    const sidebarToggle = document.getElementById('sidebarCollapse');
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-            document.getElementById('content').classList.toggle('expanded');
+    // Sidebar toggle
+    const sidebarCollapse = document.getElementById('sidebarCollapse');
+    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (sidebarCollapse) {
+        sidebarCollapse.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
         });
     }
-
-    // Mobile sidebar toggle
-    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+    
     if (sidebarCollapseBtn) {
         sidebarCollapseBtn.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
+            sidebar.classList.toggle('active');
         });
     }
+    
+    // Enable tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Enable popovers
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+    
+    // Auto-hide alerts
+    const autoHideAlerts = document.querySelectorAll('.alert-auto-hide');
+    autoHideAlerts.forEach(function(alert) {
+        setTimeout(function() {
+            new bootstrap.Alert(alert).close();
+        }, 5000);
+    });
+    
+    // Card animations
+    const animatedCards = document.querySelectorAll('.card');
+    if (window.IntersectionObserver) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        animatedCards.forEach(card => {
+            observer.observe(card);
+        });
+    } else {
+        // Fallback for browsers that don't support IntersectionObserver
+        animatedCards.forEach(card => {
+            card.classList.add('animated');
+        });
+    }
+    
+    // Mobile detection
+    const isMobile = window.matchMedia("only screen and (max-width: 768px)").matches;
+    
+    // Close sidebar on link click for mobile
+    if (isMobile) {
+        const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.add('active');
+            });
+        });
+    }
+    
+    // Add smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Add fade-in animation to elements with fade-in class
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+    });
 
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -146,3 +219,33 @@ function hideLoading() {
         spinner.remove();
     }
 }
+
+/**
+ * Display an English language notice if needed
+ * @param {HTMLElement} containerElement - The message container to check
+ */
+function checkForLanguageNotice(containerElement) {
+    // Look for common non-English language patterns
+    const content = containerElement.textContent || "";
+    const hasNonEnglishPatterns = 
+        /[\u0600-\u06FF]/.test(content) || // Arabic
+        /[\u0900-\u097F]/.test(content) || // Devanagari (Hindi)
+        /[\u0400-\u04FF]/.test(content) || // Cyrillic (Russian)
+        /[\u4E00-\u9FFF]/.test(content) || // Chinese
+        /[\u3040-\u309F]/.test(content) || // Hiragana (Japanese)
+        /[\u30A0-\u30FF]/.test(content);   // Katakana (Japanese)
+    
+    if (hasNonEnglishPatterns) {
+        const notice = document.createElement('p');
+        notice.className = 'mt-2 small text-muted';
+        notice.innerHTML = 'Note: Jarvin AI responds only in English. If you see characters in another language, this might be an error.';
+        containerElement.appendChild(notice);
+    }
+}
+
+// You can call this function after adding a new message to the chat
+// For example:
+// const messageElement = document.createElement('div');
+// messageElement.innerHTML = messageHtml;
+// chatContainer.appendChild(messageElement);
+// checkForLanguageNotice(messageElement);
