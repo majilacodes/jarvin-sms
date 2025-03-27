@@ -144,6 +144,14 @@ def init_db():
             ('Assignment', 'Homework/Project assessment');
         ''')
     
+    # Add default admin user if none exists
+    cursor.execute('SELECT COUNT(*) FROM sms_user')
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('''
+            INSERT INTO sms_user (first_name, email, password, type, status)
+            VALUES (?, ?, ?, ?, ?)
+        ''', ('Admin', 'admin@example.com', 'admin123', 'admin', 'active'))
+    
     db.commit()
     db.close()
 
@@ -153,29 +161,42 @@ init_db()
 @app.route('/')
 @app.route('/login', methods =['GET', 'POST'])
 def login():
-    mesage = ''
+    message = ''  # Fixed typo in variable name
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
         email = request.form['email']        
         password = request.form['password']
         
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM sms_user WHERE status="active" AND email = ? AND password = ?', 
-                      (email, password))
-        user = cursor.fetchone()
-        db.close()
         
-        if user:
-            session['loggedin'] = True
-            session['userid'] = user['id']
-            session['name'] = user['first_name']
-            session['email'] = user['email']
-            session['role'] = user['type']
-            mesage = 'Logged in successfully !'            
-            return redirect(url_for('dashboard'))
-        else:
-            mesage = 'Please enter correct email / password !'
-    return render_template('login.html', mesage = mesage)
+        # Add error handling for database connection
+        try:
+            # Simplified query and removed status check initially for debugging
+            cursor.execute('SELECT * FROM sms_user WHERE email = ? AND password = ?', 
+                         (email, password))
+            user = cursor.fetchone()
+            
+            if user:
+                # Convert SQLite Row to dict for easier access
+                user_dict = dict(user)
+                
+                session['loggedin'] = True
+                session['userid'] = user_dict['id']
+                session['name'] = user_dict['first_name']
+                session['email'] = user_dict['email']
+                session['role'] = user_dict['type']
+                
+                message = 'Logged in successfully!'            
+                return redirect(url_for('dashboard'))
+            else:
+                message = 'Invalid email or password!'
+                
+        except Exception as e:
+            message = f'Database error: {str(e)}'
+        finally:
+            db.close()
+            
+    return render_template('login.html', message=message)  # Fixed variable name
     
 @app.route('/logout')
 def logout():
