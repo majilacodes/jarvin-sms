@@ -4,11 +4,8 @@
  
 ![WhatsApp Image 2025-03-27 at 15 35 03_caf7355c](https://github.com/user-attachments/assets/b40ac28b-cd07-4d40-a182-e085b753eb6b)
 ![WhatsApp Image 2025-03-27 at 15 35 03_cb57ca02](https://github.com/user-attachments/assets/a7918b1d-0031-4080-8630-296ec0f0fc9b)
-![WhatsApp Image 2025-03-27 at 15 35 04_b2f59a66](https://github.com/user-attachments/assets/917036f2-8045-4c9b-80e2-28bae930505e)
-![WhatsApp Image 2025-03-27 at 15 35 04_c98dda93](https://github.com/user-attachments/assets/d19ac0e7-49c9-4be7-b044-b89af890203a)
 ![WhatsApp Image 2025-03-27 at 15 35 05_6ab354c5](https://github.com/user-attachments/assets/71421d19-138a-4e0d-83b5-42270f8b4717)
 ![WhatsApp Image 2025-03-27 at 15 35 06_6962e666](https://github.com/user-attachments/assets/462e8272-dceb-4c56-af8d-3fb8be44492b)
-![WhatsApp Image 2025-03-27 at 15 35 06_1966250f](https://github.com/user-attachments/assets/35b02344-6366-4012-b08e-3634284b4878)
 ![WhatsApp Image 2025-03-27 at 15 35 06_a72f12bc](https://github.com/user-attachments/assets/ad932e7b-522e-4b12-8646-bc7c3ccba880)
 
 ### Faculty Panel:
