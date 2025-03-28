@@ -10,9 +10,7 @@
 
 ### Faculty Panel:
 
-![WhatsApp Image 2025-03-27 at 14 24 13_1bdde213](https://github.com/user-attachments/assets/76ecdc77-a767-4741-abc8-7771381ee91b)
 ![WhatsApp Image 2025-03-27 at 14 24 30_074d47f3](https://github.com/user-attachments/assets/154ff9e0-bde2-4059-97ed-d60ef9837ef9)
-![WhatsApp Image 2025-03-27 at 14 24 54_33e0827c](https://github.com/user-attachments/assets/bb07b597-a75f-41c0-b7f6-8940d727fb3e)
 ![WhatsApp Image 2025-03-27 at 14 25 27_2876e8c5](https://github.com/user-attachments/assets/a7b43a59-2577-4cc2-b0da-73ff7b0665e7)
 
 ![WhatsApp Image 2025-03-27 at 14 25 52_3c320f09](https://github.com/user-attachments/assets/bc184c5f-28a1-4d54-bd14-a58d63bf6764)
