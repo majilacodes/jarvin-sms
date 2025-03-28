@@ -1,6 +1,8 @@
 Jarvin: AI-Driven Campus Management System
 
 Admin Panel
+
+### Faculty Enablement
  
 ![WhatsApp Image 2025-03-27 at 15 35 03_caf7355c](https://github.com/user-attachments/assets/b40ac28b-cd07-4d40-a182-e085b753eb6b)
 ![WhatsApp Image 2025-03-27 at 15 35 03_cb57ca02](https://github.com/user-attachments/assets/a7918b1d-0031-4080-8630-296ec0f0fc9b)
